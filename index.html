@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>MNG 불출현황</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Barun+Gothic&display=swap" rel="stylesheet">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyADWorIbKPZZoWx7qAriiCA2lYtf-MSdAA",
+      authDomain: "mbc-mng.firebaseapp.com",
+      projectId: "mbc-mng",
+      storageBucket: "mbc-mng.firebasestorage.app",
+      messagingSenderId: "845487713315",
+      appId: "1:845487713315:web:d8559559fa98870fde5596"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const allowedCodes = ['0001'];
+    const tbody = document.getElementById('mng-table-body');
+    const statusTracker = {};
+    const mngList = [];
+
+    for (let i = 1; i <= 27; i++) {
+      mngList.push({ num: `MNG-${String(i).padStart(2, '0')}` });
+    }
+
+    window.itemChanged = function(num, field, value) {
+      const item = mngList.find(m => m.num === num);
+      if (item) item[field] = value;
+    };
+
+    window.updateRowStatus = function(select, num) {
+      const value = select.value;
+      statusTracker[num] = {
+        status: value,
+        time: new Date()
+      };
+      renderTable();
+    };
+
+    window.resetRow = function(num) {
+      if (!confirm('정말 초기화 하시겠습니까?')) return;
+      const item = mngList.find(m => m.num === num);
+      if (item) {
+        item.vj = item.audio = item.region = item.memo = '';
+        statusTracker[item.num] = { status: '미사용', time: new Date() };
+      }
+      renderTable();
+    };
+
+    function syncToFirebase() {
+      const dbRef = ref(db, 'mngData');
+      const dataObj = {};
+      mngList.forEach(item => {
+        dataObj[item.num] = {
+          vj: item.vj || '',
+          audio: item.audio || '',
+          region: item.region || '',
+          memo: item.memo || ''
+        };
+      });
+      set(dbRef, dataObj);
+    }
+
+    function loadInitialData() {
+      const dbRef = ref(db, 'mngData');
+      onValue(dbRef, snapshot => {
+        const data = snapshot.val();
+        if (data) {
+          mngList.forEach(item => {
+            const key = item.num;
+            if (data[key]) Object.assign(item, data[key]);
+          });
+        }
+        renderTable();
+      });
+    }
+
+    function renderTable() {
+      tbody.innerHTML = '';
+      const now = new Date();
+
+      mngList.forEach(item => {
+        if (statusTracker[item.num]?.status === '미사용') {
+          const diff = now - statusTracker[item.num].time;
+          if (diff > 86400000) {
+            item.vj = item.audio = item.region = item.memo = '';
+            delete statusTracker[item.num];
+          }
+        }
+      });
+
+      const sorted = [...mngList].sort((a, b) => {
+        const aStatus = statusTracker[a.num]?.status || '미사용';
+        const bStatus = statusTracker[b.num]?.status || '미사용';
+        if (aStatus !== bStatus) return aStatus === '사용' ? -1 : 1;
+        return parseInt(a.num.replace('MNG-', '')) - parseInt(b.num.replace('MNG-', ''));
+      });
+
+      sorted.forEach(item => {
+        const tr = document.createElement('tr');
+        const status = statusTracker[item.num]?.status || '미사용';
+        tr.className = status === '사용' ? 'used' : 'unused';
+        tr.innerHTML = `
+          <td>${item.num}</td>
+          <td><input type="text" value="${item.vj || ''}" oninput="window.itemChanged('${item.num}', 'vj', this.value)"></td>
+          <td><input type="text" value="${item.audio || ''}" oninput="window.itemChanged('${item.num}', 'audio', this.value)"></td>
+          <td><input type="text" value="${item.region || ''}" oninput="window.itemChanged('${item.num}', 'region', this.value)"></td>
+          <td><input type="text" value="${item.memo || ''}" oninput="window.itemChanged('${item.num}', 'memo', this.value)"></td>
+          <td><select onchange="window.updateRowStatus(this, '${item.num}')">
+            <option value="사용" ${status === '사용' ? 'selected' : ''}>사용</option>
+            <option value="미사용" ${status === '미사용' ? 'selected' : ''}>미사용</option>
+          </select></td>
+          <td><button class="reset" onclick="window.resetRow('${item.num}')">초기화</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function login() {
+      const code = document.getElementById('login-code').value;
+      if (allowedCodes.includes(code)) {
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('main-page').style.display = 'block';
+        renderTable();
+        loadInitialData();
+        setInterval(syncToFirebase, 10000);
+      } else {
+        alert('잘못된 로그인 코드입니다.');
+      }
+    }
+
+    window.goToLogin = function() {
+      document.getElementById('main-page').style.display = 'none';
+      document.getElementById('login-page').style.display = 'block';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('login-btn').addEventListener('click', login);
+      document.getElementById('login-code').addEventListener('keydown', e => {
+        if (e.key === 'Enter') login();
+      });
+    });
+  </script>
+  <style>
+    body {
+      font-family: 'Nanum Barun Gothic', sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 1rem;
+    }
+    #login-page, #main-page {
+      display: none;
+      text-align: center;
+    }
+    #login-page.active, #main-page.active {
+      display: block;
+    }
+    img.logo {
+      cursor: pointer;
+      max-width: 400px;
+      width: 50%;
+      height: auto;
+      margin: 40px auto 20px;
+      display: block;
+    }
+    #login-code {
+      width: 340px;
+      padding: 0.6rem;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    #login-btn {
+      width: 358px;
+      padding: 0.6rem;
+      background-color: #004080;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 8px;
+      text-align: center;
+    }
+    th {
+      background: #333;
+      color: #f0f0f0;
+    }
+    .used { background-color: #b6f5c6; }
+    .unused { background-color: #cfcfcf; }
+    .unused input { background: #e0e0e0; color: #555; }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 4px;
+    }
+    button.reset {
+      background-color: #f8b0b0;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="login-page" class="active">
+    <img src="title_logo.png" class="logo" alt="타이틀 로고" onclick="goToLogin()">
+    <input id="login-code" type="password" maxlength="10" placeholder="코드를 입력하세요">
+    <br>
+    <button id="login-btn">로그인</button>
+  </div>
+
+  <div id="main-page">
+    <img src="title_logo.png" class="logo" alt="타이틀 로고 상단" onclick="goToLogin()">
+    <table>
+      <thead>
+        <tr>
+          <th>MNG 번호</th>
+          <th>영상기자/VJ</th>
+          <th>오디오맨</th>
+          <th>지역</th>
+          <th>비고</th>
+          <th>상황</th>
+          <th>RESET</th>
+        </tr>
+      </thead>
+      <tbody id="mng-table-body"></tbody>
+    </table>
+  </div>
+</body>
+</html>
