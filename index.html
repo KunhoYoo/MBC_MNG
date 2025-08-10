@@ -342,7 +342,55 @@
     .issue-submit{display:block}
     .btn-issue{ width:100%; padding:12px 14px; border:none; border-radius:12px; cursor:pointer; font-weight:600; background:linear-gradient(180deg, #1e6fd1, #1159b2); color:#fff; box-shadow:var(--shadow); }
     .tag{ display:none; } /* '불출 등록' 태그 숨김 */
-  </style>
+  
+
+/* === Mobile compact mode === */
+@media (max-width: 480px){
+  :root{
+    --font-base: 12px;
+    --font-sm: 11px;
+    --pad: 6px;
+    --rad: 12px;
+  }
+  body{ font-size: var(--font-base); }
+  .container{ padding: 10px; }
+  table{ font-size: var(--font-base); }
+  th, td{ padding: 6px 8px; }
+  thead th{ font-size: 12px; }
+  .chip{ padding: 6px 10px; font-size: 12px; border-radius: 14px; }
+  input[type="text"]{
+    height: 32px; padding: 4px 8px; font-size: 12px; border-radius: 10px;
+    min-width: 4ch; /* Ensure space for ~4 characters */
+  }
+  .reset{
+    width: 36px; height: 36px; min-width: 36px; min-height: 36px;
+    font-size: 14px; border-radius: 50%;
+  }
+  .header{ padding: 8px 0 2px; }
+  .logo{ height: 26px; }
+  .table-wrap{ border-radius: 14px; }
+  .issue-card{ padding: 12px; gap: 8px; }
+  .issue-grid{ grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-issue{ padding: 10px 12px; font-size: 13px; border-radius: 12px; }
+}
+
+
+
+/* stretch inputs to cell width */
+td input[type="text"]{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+@media (max-width: 480px){
+  td:nth-child(2), td:nth-child(3), td:nth-child(4){ padding-left:6px; padding-right:6px; }
+  td:nth-child(1){ width:84px; } /* No. */
+  td:nth-child(5){ width:56px; } /* 반납 */
+  input[type="text"]{ min-width: 6ch; } /* ensure ~6 characters visible */
+}
+
+</style>
 </head>
 <body>
   <!-- Login -->
