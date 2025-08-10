@@ -390,6 +390,125 @@ td input[type="text"]{
   input[type="text"]{ min-width: 6ch; } /* ensure ~6 characters visible */
 }
 
+
+/* widen inputs and reduce inner padding so more characters are visible */
+td input[type="text"]{
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+
+@media (max-width: 480px){
+  thead th{ font-size: 12px; }
+  th, td{ padding-left:6px; padding-right:6px; }
+  td:nth-child(2), td:nth-child(3), td:nth-child(4){ padding-left:4px; padding-right:4px; }
+  td:nth-child(1){ width:76px; } /* No. */
+  td:nth-child(5){ width:52px; } /* 반납 */
+  input[type="text"]{
+    height: 32px;
+    font-size: 12px;
+    min-width: 8ch; /* show about 8 characters */
+  }
+  .chip{ padding: 5px 8px; font-size: 12px; }
+  .reset{ width: 34px; height: 34px; min-width:34px; min-height:34px; }
+}
+
+
+/* fix logo aspect ratio */
+.logo{
+  height: 40px; /* default size */
+}
+.logo img, img.logo{
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+@media (max-width: 480px){
+  .logo{ height: 36px; }
+  .logo img, img.logo{ height: 36px; width:auto; }
+}
+
+
+/* === Mobile header single-line === */
+@media (max-width: 768px){
+  thead th{
+    white-space: nowrap;   /* prevent line breaks like '사용\n자' */
+    font-size: 12px;       /* shrink header text on mobile */
+  }
+  th, td{
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
+
+
+/* === Center login & issue pages === */
+#login-page, #issue-page{
+  min-height: 100svh;           /* include mobile safe viewport */
+  display: flex;
+  align-items: center;           /* vertical center */
+  justify-content: center;       /* horizontal center */
+  padding: 24px 16px;            /* breathing room on small screens */
+  box-sizing: border-box;
+}
+#login-page .card, #issue-page .issue-card{
+  width: 100%;
+  max-width: 760px;              /* keep a tidy width on desktop */
+  margin: 0 auto;
+}
+@media (max-width: 480px){
+  #login-page .card, #issue-page .issue-card{ max-width: 92vw; }
+}
+
+
+/* === Hard center for login & issue pages (grid) === */
+#login-page, #issue-page{
+  min-height: 100dvh;         /* cover full dynamic viewport height */
+  display: grid;              /* grid allows perfect centering */
+  place-items: center;        /* centers both horizontally and vertically */
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+#login-page .card, #issue-page .issue-card{
+  margin: 0;                  /* remove any accidental top margins */
+  width: 100%;
+  max-width: 760px;
+}
+@media (max-width: 480px){
+  #login-page .card, #issue-page .issue-card{ max-width: 92vw; }
+}
+
+
+/* === Center group (logo + card) vertically as a block === */
+#login-page, #issue-page{
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  place-content: center;   /* center the grid tracks themselves */
+  grid-auto-rows: min-content;
+  gap: 12px;               /* small space between logo and card */
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+
+/* === Show exactly one page: default hidden; .active shows === */
+#login-page, #issue-page{
+  display: none;
+}
+#login-page.active, #issue-page.active{
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  place-content: center;
+  grid-auto-rows: min-content;
+  gap: 12px;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
 </style>
 </head>
 <body>
