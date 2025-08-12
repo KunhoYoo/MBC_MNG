@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>MNG 현황판 (버튼 먹통 수정)</title>
+  <title>MNG 현황판 (실시간 토스트 알림 통합)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Barun+Gothic&display=swap" rel="stylesheet">
   <style>
@@ -54,7 +54,32 @@
     .issue-row{display:grid;gap:8px}
     .issue-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .issue-submit{display:block}
-    .btn-issue{width:100%;padding:12px 14px;border:none;border-radius:12px;cursor:pointer;font-weight:600;background:linear-gradient(180deg,#1e6fd1,#1159b2);color:#fff;box-shadow:var(--shadow)}
+    .btn-issue{width:100%;padding:12px 14px;border:none;border-radius:12px;cursor:pointer;font-weight:600;background:linear-gradient(180deg,#1e6fd1,#1159b2);color:#fff;box-shadow:var(--shadow)}    
+
+	/*현황판 상단 테이블 가운데 정렬*/
+	#status-page table thead th {
+  text-align: center;
+}	
+	/* Toast stack */
+    .toasts{
+      position:fixed; right:20px; bottom:20px; z-index:9999;
+      display:flex; flex-direction:column; align-items:flex-end; gap:10px;
+      max-width:calc(100vw - 40px);
+    }
+    .toast{
+      background:#13253a; color:#fff; border-radius:14px; padding:14px 16px;
+      box-shadow:0 18px 40px rgba(0,0,0,.22);
+      display:flex; align-items:flex-start; gap:10px; min-width:260px; max-width:360px;
+      opacity:0; transform:translateY(10px) scale(.98); animation:toast-in .25s ease forwards;
+    }
+    .toast .dot{width:14px;height:14px;border-radius:999px;margin-top:4px;flex:none}
+    .toast.issue .dot{background:#10B981}
+    .toast.return .dot{background:#3B82F6}
+    .toast .title{font-weight:800;margin:0 0 4px 0}
+    .toast .desc{margin:0;color:#E6EDF6;font-size:14px;line-height:1.35}
+    .toast-close{margin-left:auto;background:transparent;border:none;color:#9fb4cc;font-weight:800;cursor:pointer}
+    @keyframes toast-in{to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes toast-out{to{opacity:0;transform:translateY(10px) scale(.98)}}
   </style>
 </head>
 <body>
@@ -119,6 +144,10 @@
     </div>
   </div>
 
+  <!-- Toast stack & audio -->
+  <div id="toasts" class="toasts" aria-live="polite" aria-atomic="true"></div>
+  <audio id="alarm-audio" src="alarm.mp3" preload="auto"></audio>
+
   <!-- Non-module script: attach DOM listeners first, then dynamically import Firebase -->
   <script>
     // ----- App State & Utils -----
@@ -145,6 +174,35 @@
     let syncTimer = null;
     let firebaseReady = false;
     let DB = null;
+
+    // Toast state
+    const TOAST_LIFETIME = 6000; // 6초
+    let lastSeen = { issue: 0, ret: 0 };
+    function playAlarm(){
+      try{
+        // allow overlapping plays
+        const a = new Audio(document.getElementById('alarm-audio').src);
+        a.volume = 1.0;
+        a.play().catch(()=>{});
+      }catch(e){}
+    }
+    function showToast(kind, title, desc){
+      const t = document.createElement('div');
+      t.className = `toast ${kind}`;
+      t.innerHTML = `<div class="dot"></div>
+        <div style="flex:1 1 auto">
+          <div class="title">${title}</div>
+          <p class="desc">${desc}</p>
+        </div>
+        <button class="toast-close" aria-label="닫기">×</button>`;
+      const stack = document.getElementById('toasts');
+      stack.prepend(t); // 새 알림 위로
+      const closer = t.querySelector('.toast-close');
+      const remove = ()=>{ t.style.animation='toast-out .2s ease forwards'; setTimeout(()=>t.remove(), 200); };
+      closer.addEventListener('click', remove);
+      playAlarm();
+      setTimeout(remove, TOAST_LIFETIME);
+    }
 
     function isUsed(item){ return Boolean((item.vj||'').trim() || (item.audio||'').trim() || (item.region||'').trim()); }
     function formatKTime(d){ const p=x=>String(x).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}시${p(d.getMinutes())}분`; }
@@ -197,7 +255,11 @@
               item.vj=item.audio=item.region='';
               const tr = rowEl(num); if(tr){ tr.querySelectorAll('input').forEach(i=>i.value=''); }
               setRowClass(num);
-              if(firebaseReady){ await DB.setData(`mngData/${num}`, { vj:'', audio:'', region:'' }); }
+              if(firebaseReady){
+                await DB.setData(`mngData/${num}`, { vj:'', audio:'', region:'' });
+                // 반납 알림 발행
+                await DB.setData('lastReturn', { mng:num, user:'-', region:'-', returnedBy: currentUserName || '(알수없음)', ts: Date.now() });
+              }
               refreshIssueDropdown(); return;
             }
             const histBtn = e.target.closest('button[data-history]');
@@ -263,7 +325,11 @@
       if(!user){ alert('사용자 이름을 입력해주세요.'); return; }
       if(!region){ alert('위치를 입력해주세요.'); return; }
       await appendHistory(mng, { vj:user, audio: currentUserName || '', region, issuedAt: new Date().toISOString() });
-      if(firebaseReady){ await DB.setData(`mngData/${mng}`, { vj:user, audio: currentUserName || '', region }); }
+      if(firebaseReady){
+        await DB.setData(`mngData/${mng}`, { vj:user, audio: currentUserName || '', region });
+        // 불출 알림 발행
+        await DB.setData('lastIssue', { mng, user, region, issuedBy: currentUserName || '(알수없음)', ts: Date.now() });
+      }
       alert('불출 되었습니다!'); if(userEl) userEl.value=''; if(regionEl) regionEl.value=''; refreshIssueDropdown();
     }
 
@@ -339,6 +405,21 @@
               if(dataListenersStarted) return;
               onValue(ref(db,'mngData'), snap => populateFromSnapshot(snap.val()));
               onValue(ref(db,'mngHistory'), snap => { histories = snap.val() || {}; });
+              // 실시간 알림 구독
+              onValue(ref(db,'lastIssue'), snap => {
+                const v = snap.val(); if(!v) return;
+                if(document.getElementById('status-page').style.display !== 'block') return;
+                if(v.ts && v.ts <= lastSeen.issue) return;
+                lastSeen.issue = v.ts || Date.now();
+                showToast('issue', '새 불출 알림', `${v.issuedBy}님이 ${v.mng}를 불출했습니다<br>${v.user} / ${v.region}`);
+              });
+              onValue(ref(db,'lastReturn'), snap => {
+                const v = snap.val(); if(!v) return;
+                if(document.getElementById('status-page').style.display !== 'block') return;
+                if(v.ts && v.ts <= lastSeen.ret) return;
+                lastSeen.ret = v.ts || Date.now();
+                showToast('return', '반납 알림', `${v.returnedBy}님이 ${v.mng}를 반납했습니다`);
+              });
               dataListenersStarted = true;
             },
             syncAll: () => {
