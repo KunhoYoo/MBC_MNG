@@ -2,24 +2,222 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>MNG 현황판</title>
+  <title>MNG 현황판 (2컬럼/반응형) – FIX</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Barun+Gothic&display=swap" rel="stylesheet">
 
+  <style>
+    :root{
+      --brand:#1477C9;
+      --brand-soft:#E7F1FB;
+      --ink:#0F172A;
+      --muted:#5B6C80;
+      --line:#E6EBF2;
+      --bg:#F6F9FD;
+      --card:#FFFFFF;
+      --success:#16A34A;
+      --radius:16px;
+      --shadow:0 10px 30px rgba(20,119,201,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family:'Nanum Barun Gothic',system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
+      background:var(--bg); color:var(--ink);
+      margin:0; padding:0;
+      -webkit-font-smoothing:antialiased;
+      -webkit-tap-highlight-color:transparent;
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+    }
+    img.logo{ cursor:pointer; max-width:360px; width:min(58%, 360px); display:block; margin:18px auto 12px; }
+
+    /* Screens */
+    #login-page,#status-page,#issue-page{display:none; width:100%;}
+    #login-page.active{display:flex}
+    .screen{ width:100%; }
+    .container{max-width:1200px; margin:0 auto; padding:16px}
+
+    /* Center login vertically & horizontally */
+    #login-page{
+      min-height:100vh;
+      align-items:center; justify-content:center; flex-direction:column;
+      padding:24px;
+    }
+    .login-card{ width:min(680px, 92vw); background:var(--card); padding:22px; border-radius:20px; box-shadow:var(--shadow); border:1px solid var(--line); }
+    .login-grid{display:grid; grid-template-columns:1fr; gap:12px}
+    .login-actions{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    input[type="password"], input[type="text"], select{
+      width:100%; padding:14px 16px; border:1px solid var(--line); border-radius:12px; font-size:16px; background:#fff; outline:none;
+    }
+    input:focus, select:focus{ border-color:var(--brand); box-shadow:0 0 0 4px rgba(20,119,201,.15); }
+    .btn{ padding:12px 14px; border:none; border-radius:12px; cursor:pointer; font-weight:700; background:var(--brand); color:#fff; box-shadow:var(--shadow); }
+    .btn.secondary{background:#fff; color:var(--brand); border:1px solid var(--brand)}
+    .login-footer{margin-top:6px; text-align:center; color:var(--muted); font-weight:700}
+    .emoji{font-size:16px}
+
+    /* Tables grid: mobile 1-col, desktop 2-col */
+    .tables-grid{display:grid; grid-template-columns:1fr; gap:16px;}
+    @media (min-width: 1024px){
+      .tables-grid{grid-template-columns:1fr 1fr;}
+    }
+
+    .table-wrap{ background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:hidden;}
+    table{width:100%; border-collapse:collapse; table-layout:fixed}
+    thead th{
+      background:linear-gradient(180deg, var(--brand-soft), #F3F8FF);
+      color:#133559; font-weight:800; font-size:14px; letter-spacing:.2px;
+      text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);
+      position:sticky; top:0; z-index:2;
+      white-space:nowrap;
+    }
+    thead th:first-child{width:110px}
+    thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4){width:28%}
+    thead th:last-child{width:90px; text-align:center}
+
+    tbody tr{border-bottom:1px solid var(--line); background:#fff}
+    tbody tr.used td.left-stamp{border-left:6px solid var(--success)}
+    tbody tr.unused td.left-stamp{border-left:6px solid #CBD5E1}
+    tbody td{padding:8px 10px; vertical-align:middle}
+    tbody td:last-child{text-align:center}
+
+    .chip{ display:inline-flex; align-items:center; justify-content:center;
+      padding:6px 10px; border-radius:999px; font-weight:800; font-size:13px; border:1px solid var(--line); background:#fff; cursor:pointer; }
+    .chip-used{ border-color:rgba(22,163,74,.45); background:linear-gradient(180deg,#E7F7EE,#F3FBF6); color:#065F46}
+    .chip-idle{ border-color:#E5E7EB; background:#F8FAFC; color:#334155}
+
+    input[type="text"]{ width:100%; padding:10px 12px; border:1px solid #D7DFEA; border-radius:12px; font-size:14px; outline:none; background:#fff; }
+    input[type="text"]::placeholder{color:#9DA8B8}
+    input[type="text"]:focus{ border-color:var(--brand); box-shadow:0 0 0 4px rgba(20,119,201,.12); }
+
+    .reset{ width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center;
+      border-radius:999px; background:#FEE2E2; color:#B91C1C; border:1px solid #FCA5A5; cursor:pointer; }
+
+    /* Compact mobile */
+    @media (max-width:720px){
+      .container{padding:10px}
+      thead th{font-size:13px; padding:9px 10px}
+      tbody td{padding:7px 8px}
+      .chip{font-size:12px; padding:5px 8px}
+      .reset{width:32px; height:32px}
+    }
+    @media (max-width:480px){
+      thead th{ font-size:12px; }
+      th, td{ padding-left:6px; padding-right:6px; }
+      td:nth-child(1){ width:84px; }
+      td:nth-child(5){ width:56px; }
+      input[type="text"]{ height:32px; font-size:12px; padding:4px 8px; border-radius:10px; }
+      .chip{ padding:5px 8px; font-size:12px; }
+      .reset{ width:34px; height:34px; min-width:34px; min-height:34px; }
+    }
+
+    /* Issue */
+    .issue-card{ max-width:560px; margin:24px auto; background:var(--card); border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow); padding:18px; display:grid; gap:12px;}
+    .issue-row{display:grid; gap:8px}
+    .issue-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .issue-submit{display:block}
+    .btn-issue{ width:100%; padding:12px 14px; border:none; border-radius:12px; cursor:pointer; font-weight:600; background:linear-gradient(180deg, #1e6fd1, #1159b2); color:#fff; box-shadow:var(--shadow); }
+  </style>
+</head>
+<body>
+  <!-- Login -->
+  <div id="login-page" class="screen active">
+    <img src="title_logo.png" class="logo" alt="타이틀 로고">
+    <div class="login-card">
+      <div class="login-grid">
+        <input id="login-code" type="password" placeholder="코드를 입력하세요">
+        <div class="login-actions">
+          <button id="btn-login-status" class="btn">현황</button>
+          <button id="btn-login-issue" class="btn secondary">불출</button>
+        </div>
+        <div class="login-footer">MNG 현황 최신화 잘 부탁드립니다 📡</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Page -->
+  <div id="status-page" class="screen">
+    <img src="title_logo.png" class="logo" alt="타이틀 로고" onclick="toLogin()">
+    <div class="container">
+      <div class="tables-grid">
+        <!-- 왼쪽 10개 -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>사용자</th>
+                <th>불출자</th>
+                <th>위치</th>
+                <th>반납</th>
+              </tr>
+            </thead>
+            <tbody id="mng-left"></tbody>
+          </table>
+        </div>
+
+        <!-- 오른쪽 10개 -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>사용자</th>
+                <th>불출자</th>
+                <th>위치</th>
+                <th>반납</th>
+              </tr>
+            </thead>
+            <tbody id="mng-right"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Issue Page -->
+  <div id="issue-page" class="screen">
+    <img src="title_logo.png" class="logo" alt="타이틀 로고" onclick="toLogin()">
+    <div class="issue-card">
+      <div class="issue-row">
+        <label for="issue-mng" style="font-weight:800">MNG 선택</label>
+        <select id="issue-mng"></select>
+      </div>
+      <div class="issue-grid">
+        <div class="issue-row">
+          <label style="font-weight:800">사용자</label>
+          <input id="issue-user" type="text" placeholder="이름">
+        </div>
+        <div class="issue-row">
+          <label style="font-weight:800">불출자</label>
+          <input id="issue-issuer" type="text" placeholder="자동 입력" disabled>
+        </div>
+      </div>
+      <div class="issue-row">
+        <label style="font-weight:800">위치</label>
+        <input id="issue-region" type="text" placeholder="예: 강남">
+      </div>
+      <div class="issue-submit">
+        <button id="btn-issue-submit" class="btn-issue">불출</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS (module) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
 
     // ==== Firebase ====
     const firebaseConfig = {
-  apiKey: "AIzaSyADWorIbKPZZoWx7qAriiCA2lYtf-MSdAA",
-  authDomain: "mbc-mng.firebaseapp.com",
-  databaseURL: "https://mbc-mng-default-rtdb.firebaseio.com",
-  projectId: "mbc-mng",
-  storageBucket: "mbc-mng.firebasestorage.app",
-  messagingSenderId: "845487713315",
-  appId: "1:845487713315:web:d8559559fa98870fde5596"
-};
+      apiKey: "AIzaSyADWorIbKPZZoWx7qAriiCA2lYtf-MSdAA",
+      authDomain: "mbc-mng.firebaseapp.com",
+      databaseURL: "https://mbc-mng-default-rtdb.firebaseio.com",
+      projectId: "mbc-mng",
+      storageBucket: "mbc-mng.firebasestorage.app",
+      messagingSenderId: "845487713315",
+      appId: "1:845487713315:web:d8559559fa98870fde5596"
+    };
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
@@ -78,19 +276,12 @@
   "qkrwjdejr": "박정덕",
   "wkdwodms": "장재은",
   "wkddudrms": "장영근"
-}; // 한글 키패드 '유건호'
-    const MNG_NUMBERS = [1,2,3,4,6,7,8,9,10,17,18,19,20,21,22,23,24,25,26,27];
+    };
+    const MNG_NUMBERS = [1,2,3,4,5,6,7,8,9,10,17,18,19,20,21,22,23,24,25,26];
     const mngList = MNG_NUMBERS.map(n => ({ num: `MNG-${String(n).padStart(2,'0')}`, vj:'', audio:'', region:'' }));
     let histories = {};
     let currentUserName = "";
     let intendedMode = "status"; // 'status' or 'issue'
-
-    // Helpers
-    const tbody = document.getElementById('mng-table-body');
-    const issueMngSel = document.getElementById('issue-mng');
-    const issueUser = document.getElementById('issue-user');
-    const issueRegion = document.getElementById('issue-region');
-    const issueIssuer = document.getElementById('issue-issuer');
 
     function isUsed(item){
       return Boolean((item.vj||'').trim() || (item.audio||'').trim() || (item.region||'').trim());
@@ -113,101 +304,90 @@
       }
     }
 
-    // Build table ONCE to keep focus/Tab order stable
+    function appendHistory(num, entry){
+      const arr = histories[num] ? [...histories[num]] : [];
+      arr.unshift(entry);
+      histories[num] = arr.slice(0,5);
+      return set(ref(db, `mngHistory/${num}`), histories[num]);
+    }
+
     function buildTableOnce(){
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      mngList.forEach(item=>{
+      const tbodyLeft  = document.getElementById('mng-left');
+      const tbodyRight = document.getElementById('mng-right');
+      if (!tbodyLeft || !tbodyRight) return;
+      tbodyLeft.innerHTML = '';
+      tbodyRight.innerHTML = '';
+      mngList.forEach((item, idx)=>{
         const tr = document.createElement('tr');
         tr.dataset.num = item.num;
         tr.className = 'unused';
         tr.innerHTML = `
           <td class="left-stamp">
-            <button class="chip chip-idle" onclick="window.showHistory('${item.num}')">${item.num}</button>
+            <button class="chip chip-idle" data-history="${item.num}">${item.num}</button>
           </td>
           <td><input type="text" data-field="vj" placeholder="이름"></td>
           <td><input type="text" data-field="audio" placeholder="이름"></td>
           <td><input type="text" data-field="region" placeholder="예: 강남"></td>
           <td class="action-cell">
-            <button class="reset" title="반납(초기화)" onclick="window.resetRow('${item.num}')" aria-label="반납">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-                <path d="M9 3h6a1 1 0 0 1 1 1v1h3a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V7H5a1 1 0 1 1 0-2h3V4a1 1 0 0 1 1-1zm1 2v0h4V4h-4v1zm-1 4a1 1 0 0 1 2 0v8a1 1 0 1 1-2 0V9zm6 0a1 1 0 0 1 2 0v8a1 1 0 1 1-2 0V9z"/>
-              </svg>
-            </button>
+            <button class="reset" data-reset="${item.num}" title="반납(초기화)" aria-label="반납">⟲</button>
           </td>`;
-        tbody.appendChild(tr);
+        (idx < 10 ? tbodyLeft : tbodyRight).appendChild(tr);
+      });
 
-        // attach handlers per input (no re-render)
-        tr.querySelectorAll('input').forEach(inp=>{
-          inp.addEventListener('input', ()=>{
-            const field = inp.dataset.field;
-            const value = inp.value;
-            const target = mngList.find(m=>m.num===item.num);
-            target[field] = value;
-            setRowClass(item.num); // only toggle class; do not rebuild
-            refreshIssueDropdown(); // keep "불출" 드롭다운에서 사용 중 장비 제외
-          });
+      // Delegate events to avoid missing listeners
+      [tbodyLeft, tbodyRight].forEach(tbody=>{
+        tbody.addEventListener('input', (e)=>{
+          const inp = e.target.closest('input[data-field]'); if(!inp) return;
+          const tr = e.target.closest('tr'); if(!tr) return;
+          const num = tr.dataset.num;
+          const field = inp.dataset.field;
+          const item = mngList.find(m=>m.num===num);
+          if (!item) return;
+          item[field] = inp.value;
+          setRowClass(num);
+          refreshIssueDropdown();
+        });
+        tbody.addEventListener('click', async (e)=>{
+          const resetBtn = e.target.closest('button[data-reset]');
+          if (resetBtn){
+            const num = resetBtn.dataset.reset;
+            const item = mngList.find(m=>m.num===num);
+            if (!item) return;
+            if (!confirm('해당 MNG 반납처리 하시겠습니까?')) return;
+            if (isUsed(item)){
+              await appendHistory(num, { vj:item.vj||'', audio:item.audio||'', region:item.region||'', returnedAt:new Date().toISOString() });
+            }
+            item.vj = item.audio = item.region = '';
+            const tr = rowEl(num);
+            if (tr){ tr.querySelectorAll('input').forEach(i=> i.value=''); }
+            setRowClass(num);
+            await set(ref(db, `mngData/${num}`), { vj:'', audio:'', region:'' });
+            refreshIssueDropdown();
+            return;
+          }
+          const histBtn = e.target.closest('button[data-history]');
+          if (histBtn){
+            const num = histBtn.dataset.history;
+            const arr = histories && histories[num] ? histories[num] : [];
+            if (!arr.length){ alert(`<${num} 과거 기록>\n기록이 없습니다.`); return; }
+            const safeTime = (ts)=>{
+              if (!ts) return '-';
+              const d = new Date(ts);
+              return isNaN(d) ? '-' : formatKTime(d);
+            };
+            const lines = arr.map(e => {
+              const ts = e.returnedAt || e.issuedAt;
+              const action = e.returnedAt ? '반납' : (e.issuedAt ? '불출' : '');
+              const timeStr = safeTime(ts);
+              return `${e.vj||'-'} / ${e.audio||'-'} / ${e.region||'-'} / ${timeStr} ${action}`;
+            });
+            alert(`<${num} 과거 기록>\n` + lines.join('\n'));
+          }
         });
       });
     }
-
-    async function appendHistory(num, entry){
-      const arr = histories[num] ? [...histories[num]] : [];
-      arr.unshift(entry);
-      histories[num] = arr.slice(0,5);
-      await set(ref(db, `mngHistory/${num}`), histories[num]);
-    }
-
-    window.resetRow = async function(num){
-      const item = mngList.find(m=>m.num===num);
-      if (!item) return;
-      if (!confirm('해당 MNG 반납처리 하시겠습니까?')) return;
-
-      // Save history first if used
-      if (isUsed(item)){
-        await appendHistory(num, {
-          vj: item.vj || '', audio: item.audio || '', region: item.region || '',
-          returnedAt: new Date().toISOString()
-        });
-      }
-
-      // Clear local
-      item.vj = item.audio = item.region = '';
-
-      // Clear inputs in-place (keep elements & focus behavior)
-      const r = rowEl(num);
-      if (r){ r.querySelectorAll('input').forEach(inp => inp.value = ''); }
-      setRowClass(num);
-
-      // Clear DB for this single row immediately (no delay)
-      await set(ref(db, `mngData/${num}`), { vj:'', audio:'', region:'' });
-
-      // 현황판은 onValue 리스너로 자동 업데이트됩니다.
-      // 필요 시 이 행만 시각적으로 비움 처리 완료.
-      refreshIssueDropdown();
-    };
-
-    
-    window.showHistory = function(num){
-      const arr = histories && histories[num] ? histories[num] : [];
-      if (!arr.length){ alert(`<${num} 과거 기록>\n기록이 없습니다.`); return; }
-      const safeTime = (ts)=>{
-        if (!ts) return '-';
-        const d = new Date(ts);
-        return isNaN(d) ? '-' : formatKTime(d);
-      };
-      const lines = arr.map(e => {
-        const ts = e.returnedAt || e.issuedAt;
-        const action = e.returnedAt ? '반납' : (e.issuedAt ? '불출' : '');
-        const timeStr = safeTime(ts);
-        return `${e.vj||'-'} / ${e.audio||'-'} / ${e.region||'-'} / ${timeStr} ${action}`;
-      });
-      alert(`<${num} 과거 기록>\n` + lines.join('\n'));
-    };
-
 
     function populateFromSnapshot(data){
-      // do NOT rebuild table; only set input values & state
       mngList.forEach(item => {
         if (data && data[item.num]){ Object.assign(item, data[item.num]); }
         const r = rowEl(item.num);
@@ -235,15 +415,16 @@
       onValue(ref(db, 'mngHistory'), snap => { histories = snap.val() || {}; });
     }
 
-    // ==== Issue page ====
+    // ==== Issue helpers ====
     function buildIssueDropdown(all=true){
+      const issueMngSel = document.getElementById('issue-mng');
       if (!issueMngSel) return;
       issueMngSel.innerHTML = '<option value="" disabled selected>선택</option>';
       MNG_NUMBERS.forEach(n=>{
         const label = `MNG-${String(n).padStart(2,'0')}`;
         if (!all){
           const item = mngList.find(m=>m.num===label);
-          if (item && isUsed(item)) return; // exclude used
+          if (item && isUsed(item)) return;
         }
         const opt = document.createElement('option');
         opt.value = label; opt.textContent = label;
@@ -251,395 +432,74 @@
       });
     }
     function refreshIssueDropdown(){ buildIssueDropdown(false); }
-    function hydrateIssuePreview(){ if (issueIssuer) issueIssuer.value = currentUserName || ''; }
 
-    window.submitIssue = async function(){
+    async function submitIssue(){
+      const issueMngSel = document.getElementById('issue-mng');
+      const issueUser = document.getElementById('issue-user');
+      const issueRegion = document.getElementById('issue-region');
+      if (!issueMngSel) return;
+
       const mng = issueMngSel.value;
-      const user = issueUser.value.trim();
-      const region = issueRegion.value.trim();
+      const user = (issueUser?.value || '').trim();
+      const region = (issueRegion?.value || '').trim();
       if (!mng){ alert('MNG를 선택해주세요.'); return; }
       if (!user){ alert('사용자 이름을 입력해주세요.'); return; }
       if (!region){ alert('위치를 입력해주세요.'); return; }
       await appendHistory(mng, { vj:user, audio: currentUserName || '', region, issuedAt: new Date().toISOString() });
       await set(ref(db, `mngData/${mng}`), { vj:user, audio: currentUserName || '', region });
       alert('불출 되었습니다!');
-      issueUser.value = ''; issueRegion.value = '';
-      refreshIssueDropdown(); // 방금 불출된 항목 제거
-    };
+      if (issueUser) issueUser.value = '';
+      if (issueRegion) issueRegion.value = '';
+      refreshIssueDropdown();
+    }
 
-    // ==== Login & routing ====
-    const loginPage = document.getElementById('login-page');
-    const statusPage = document.getElementById('status-page');
-    const issuePage = document.getElementById('issue-page');
-    const codeInput = document.getElementById('login-code');
+    // ==== Login & routing (bind after DOMContentLoaded) ====
+    window.addEventListener('DOMContentLoaded', () => {
+      const loginPage  = document.getElementById('login-page');
+      const statusPage = document.getElementById('status-page');
+      const issuePage  = document.getElementById('issue-page');
+      const codeInput  = document.getElementById('login-code');
+      const btnStatus  = document.getElementById('btn-login-status');
+      const btnIssue   = document.getElementById('btn-login-issue');
+      const btnIssueSubmit = document.getElementById('btn-issue-submit');
 
-    window.chooseMode = function(mode){ intendedMode = mode; };
-
-    function login(){
-      const code = codeInput.value.trim();
-      if (CODE_TO_USER[code]){
-        currentUserName = CODE_TO_USER[code];
-        loginPage.style.display = 'none';
-        if (intendedMode === 'issue'){
-          issuePage.style.display = 'block';
-          buildIssueDropdown(false);
-          hydrateIssuePreview();
-          loadInitialData(); // keep in sync even on issue page
-        }else{
-          statusPage.style.display = 'block';
-          buildTableOnce();
-          loadInitialData();
-          setInterval(syncToFirebase, 5000); // 5s autosave (changed from 10s)
-        }
-      }else{
-        alert('잘못된 로그인 코드입니다.');
+      function toLogin(){
+        statusPage.style.display = 'none';
+        issuePage.style.display = 'none';
+        loginPage.style.display = 'flex';
+        loginPage.classList.add('active');
       }
-    }
+      window.toLogin = toLogin; // expose
 
-    window.toLogin = function(){
-      statusPage.style.display = 'none';
-      issuePage.style.display = 'none';
-      loginPage.style.display = 'block';
-    };
+      function chooseMode(mode){ intendedMode = mode; }
+      function login(){
+        const code = codeInput.value.trim();
+        if (CODE_TO_USER[code]){
+          currentUserName = CODE_TO_USER[code];
+          loginPage.style.display = 'none';
+          loginPage.classList.remove('active');
+          if (intendedMode === 'issue'){
+            issuePage.style.display = 'block';
+            buildIssueDropdown(false);
+            const issuer = document.getElementById('issue-issuer');
+            if (issuer) issuer.value = currentUserName || '';
+            loadInitialData();
+          }else{
+            statusPage.style.display = 'block';
+            buildTableOnce();
+            loadInitialData();
+            setInterval(syncToFirebase, 5000);
+          }
+        }else{
+          alert('잘못된 로그인 코드입니다.');
+        }
+      }
 
-    document.getElementById('btn-login-status').addEventListener('click', ()=>{ chooseMode('status'); login(); });
-    document.getElementById('btn-login-issue').addEventListener('click', ()=>{ chooseMode('issue'); login(); });
-    codeInput.addEventListener('keydown', e=>{ if (e.key==='Enter'){ login(); } });
+      if (btnStatus) btnStatus.addEventListener('click', ()=>{ chooseMode('status'); login(); });
+      if (btnIssue)  btnIssue.addEventListener('click',  ()=>{ chooseMode('issue');  login(); });
+      if (btnIssueSubmit) btnIssueSubmit.addEventListener('click', submitIssue);
+      if (codeInput) codeInput.addEventListener('keydown', e=>{ if (e.key==='Enter'){ chooseMode('status'); login(); } });
+    });
   </script>
-
-  <style>
-    :root{
-      --brand:#1477C9;         /* 로고 블루 계열 */
-      --brand-soft:#E7F1FB;
-      --ink:#0F172A;
-      --muted:#5B6C80;
-      --line:#E6EBF2;
-      --bg:#F6F9FD;
-      --card:#FFFFFF;
-      --success:#16A34A;
-      --idle:#A2AFC3;
-      --radius:16px;
-      --shadow:0 10px 30px rgba(20,119,201,.08);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      font-family:'Nanum Barun Gothic',system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-      margin:0;
-      padding:16px;
-      -webkit-font-smoothing:antialiased;
-      -webkit-tap-highlight-color:transparent;
-    }
-    img.logo{
-      cursor:pointer;
-      max-width:360px;
-      width:min(58%, 360px);
-      display:block;
-      margin:18px auto 12px;
-    }
-
-    /* Login */
-    #login-page,#status-page,#issue-page{display:none}
-    #login-page.active{display:block}
-    .login-card{
-      max-width:520px; margin:0 auto; background:var(--card);
-      padding:22px; border-radius:20px; box-shadow:var(--shadow);
-      border:1px solid var(--line);
-    }
-    .login-grid{display:grid; grid-template-columns:1fr; gap:12px}
-    .login-actions{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    input[type="password"], input[type="text"], select{
-      width:100%; padding:12px 14px;
-      border:1px solid var(--line); border-radius:12px; font-size:16px; background:#fff; outline:none;
-    }
-    input:focus, select:focus{ border-color:var(--brand); box-shadow:0 0 0 4px rgba(20,119,201,.15); }
-    .btn{ padding:12px 14px; border:none; border-radius:12px; cursor:pointer; font-weight:700;
-      background:var(--brand); color:#fff; box-shadow:var(--shadow); }
-    .btn.secondary{background:#fff; color:var(--brand); border:1px solid var(--brand)}
-    .login-footer{margin-top:6px; text-align:center; color:var(--muted); font-weight:700}
-    .emoji{font-size:16px}
-
-    .container{max-width:1200px; margin:0 auto; padding:8px}
-
-    /* Status table */
-    .table-wrap{ background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:hidden;}
-    table{width:100%; border-collapse:collapse; table-layout:fixed}
-    thead th{
-      background:linear-gradient(180deg, var(--brand-soft), #F3F8FF);
-      color:#133559; font-weight:800; font-size:14px; letter-spacing:.2px;
-      text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);
-      position:sticky; top:0; z-index:2;
-    }
-    thead th:first-child{width:110px}
-    thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4){width:28%}
-    thead th:last-child{width:90px; text-align:center}
-
-    tbody tr{border-bottom:1px solid var(--line); background:#fff}
-    tbody tr.used td.left-stamp{border-left:6px solid var(--success)}
-    tbody tr.unused td.left-stamp{border-left:6px solid #CBD5E1}
-    tbody td{padding:8px 10px; vertical-align:middle}
-    tbody td:last-child{text-align:center}
-
-    .chip{ display:inline-flex; align-items:center; justify-content:center;
-      padding:6px 10px; border-radius:999px; font-weight:800; font-size:13px; border:1px solid var(--line); background:#fff; cursor:pointer; }
-    .chip-used{ border-color:rgba(22,163,74,.45); background:linear-gradient(180deg,#E7F7EE,#F3FBF6); color:#065F46}
-    .chip-idle{ border-color:#E5E7EB; background:#F8FAFC; color:#334155}
-
-    input[type="text"]{ width:100%; padding:10px 12px; border:1px solid #D7DFEA; border-radius:12px; font-size:14px; outline:none; background:#fff; }
-    input[type="text"]::placeholder{color:#9DA8B8}
-    input[type="text"]:focus{ border-color:var(--brand); box-shadow:0 0 0 4px rgba(20,119,201,.12); }
-
-    .reset{ width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center;
-      border-radius:999px; background:#FEE2E2; color:#B91C1C; border:1px solid #FCA5A5; cursor:pointer; }
-    @media (max-width:720px){
-      body{padding:10px}
-      thead th{font-size:13px; padding:9px 10px}
-      tbody td{padding:7px 8px}
-      .chip{font-size:12px; padding:5px 8px}
-      .reset{width:32px; height:32px}
-    }
-
-    /* Issue page (clean card style like the sample) */
-    .issue-card{ max-width:560px; margin:0 auto; background:var(--card); border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow); padding:18px; display:grid; gap:12px;}
-    .issue-row{display:grid; gap:8px}
-    .issue-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    .issue-submit{display:block}
-    .btn-issue{ width:100%; padding:12px 14px; border:none; border-radius:12px; cursor:pointer; font-weight:600; background:linear-gradient(180deg, #1e6fd1, #1159b2); color:#fff; box-shadow:var(--shadow); }
-    .tag{ display:none; } /* '불출 등록' 태그 숨김 */
-  
-
-/* === Mobile compact mode === */
-@media (max-width: 480px){
-  :root{
-    --font-base: 12px;
-    --font-sm: 11px;
-    --pad: 6px;
-    --rad: 12px;
-  }
-  body{ font-size: var(--font-base); }
-  .container{ padding: 10px; }
-  table{ font-size: var(--font-base); }
-  th, td{ padding: 6px 8px; }
-  thead th{ font-size: 12px; }
-  .chip{ padding: 6px 10px; font-size: 12px; border-radius: 14px; }
-  input[type="text"]{
-    height: 32px; padding: 4px 8px; font-size: 12px; border-radius: 10px;
-    min-width: 4ch; /* Ensure space for ~4 characters */
-  }
-  .reset{
-    width: 36px; height: 36px; min-width: 36px; min-height: 36px;
-    font-size: 14px; border-radius: 50%;
-  }
-  .header{ padding: 8px 0 2px; }
-  .logo{ height: 26px; }
-  .table-wrap{ border-radius: 14px; }
-  .issue-card{ padding: 12px; gap: 8px; }
-  .issue-grid{ grid-template-columns: 1fr 1fr; gap: 8px; }
-  .btn-issue{ padding: 10px 12px; font-size: 13px; border-radius: 12px; }
-}
-
-
-
-/* stretch inputs to cell width */
-td input[type="text"]{
-  width: 100%;
-  box-sizing: border-box;
-}
-
-
-@media (max-width: 480px){
-  td:nth-child(2), td:nth-child(3), td:nth-child(4){ padding-left:6px; padding-right:6px; }
-  td:nth-child(1){ width:84px; } /* No. */
-  td:nth-child(5){ width:56px; } /* 반납 */
-  input[type="text"]{ min-width: 6ch; } /* ensure ~6 characters visible */
-}
-
-
-/* widen inputs and reduce inner padding so more characters are visible */
-td input[type="text"]{
-  width: 100%;
-  box-sizing: border-box;
-  padding-left: 6px;
-  padding-right: 6px;
-}
-
-
-@media (max-width: 480px){
-  thead th{ font-size: 12px; }
-  th, td{ padding-left:6px; padding-right:6px; }
-  td:nth-child(2), td:nth-child(3), td:nth-child(4){ padding-left:4px; padding-right:4px; }
-  td:nth-child(1){ width:76px; } /* No. */
-  td:nth-child(5){ width:52px; } /* 반납 */
-  input[type="text"]{
-    height: 32px;
-    font-size: 12px;
-    min-width: 8ch; /* show about 8 characters */
-  }
-  .chip{ padding: 5px 8px; font-size: 12px; }
-  .reset{ width: 34px; height: 34px; min-width:34px; min-height:34px; }
-}
-
-
-/* fix logo aspect ratio */
-.logo{
-  height: 40px; /* default size */
-}
-.logo img, img.logo{
-  height: 40px;
-  width: auto;
-  object-fit: contain;
-}
-@media (max-width: 480px){
-  .logo{ height: 36px; }
-  .logo img, img.logo{ height: 36px; width:auto; }
-}
-
-
-/* === Mobile header single-line === */
-@media (max-width: 768px){
-  thead th{
-    white-space: nowrap;   /* prevent line breaks like '사용\n자' */
-    font-size: 12px;       /* shrink header text on mobile */
-  }
-  th, td{
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
-}
-
-
-/* === Center login & issue pages === */
-#login-page, #issue-page{
-  min-height: 100svh;           /* include mobile safe viewport */
-  display: flex;
-  align-items: center;           /* vertical center */
-  justify-content: center;       /* horizontal center */
-  padding: 24px 16px;            /* breathing room on small screens */
-  box-sizing: border-box;
-}
-#login-page .card, #issue-page .issue-card{
-  width: 100%;
-  max-width: 760px;              /* keep a tidy width on desktop */
-  margin: 0 auto;
-}
-@media (max-width: 480px){
-  #login-page .card, #issue-page .issue-card{ max-width: 92vw; }
-}
-
-
-/* === Hard center for login & issue pages (grid) === */
-#login-page, #issue-page{
-  min-height: 100dvh;         /* cover full dynamic viewport height */
-  display: grid;              /* grid allows perfect centering */
-  place-items: center;        /* centers both horizontally and vertically */
-  padding: 24px 16px;
-  box-sizing: border-box;
-}
-#login-page .card, #issue-page .issue-card{
-  margin: 0;                  /* remove any accidental top margins */
-  width: 100%;
-  max-width: 760px;
-}
-@media (max-width: 480px){
-  #login-page .card, #issue-page .issue-card{ max-width: 92vw; }
-}
-
-
-/* === Center group (logo + card) vertically as a block === */
-#login-page, #issue-page{
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  place-content: center;   /* center the grid tracks themselves */
-  grid-auto-rows: min-content;
-  gap: 12px;               /* small space between logo and card */
-  padding: 24px 16px;
-  box-sizing: border-box;
-}
-
-
-/* === Show exactly one page: default hidden; .active shows === */
-#login-page, #issue-page{
-  display: none;
-}
-#login-page.active, #issue-page.active{
-  display: grid;
-  min-height: 100dvh;
-  place-items: center;
-  place-content: center;
-  grid-auto-rows: min-content;
-  gap: 12px;
-  padding: 24px 16px;
-  box-sizing: border-box;
-}
-
-</style>
-</head>
-<body>
-  <!-- Login -->
-  <div id="login-page" class="active">
-    <img src="title_logo.png" class="logo" alt="타이틀 로고">
-    <div class="login-card">
-      <div class="login-grid">
-        <input id="login-code" type="password" placeholder="코드를 입력하세요">
-        <div class="login-actions">
-          <button id="btn-login-status" class="btn">현황</button>
-          <button id="btn-login-issue" class="btn secondary">불출</button>
-        </div>
-        <div class="login-footer">MNG 현황 최신화 잘 부탁드립니다 <span class="emoji">📡</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Status Page -->
-  <div id="status-page">
-    <img src="title_logo.png" class="logo" alt="타이틀 로고" onclick="toLogin()">
-    <div class="container">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>No.</th>
-              <th>사용자</th>
-              <th>불출자</th>
-              <th>위치</th>
-              <th>반납</th>
-            </tr>
-          </thead>
-          <tbody id="mng-table-body"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Issue Page -->
-  <div id="issue-page">
-    <img src="title_logo.png" class="logo" alt="타이틀 로고" onclick="toLogin()">
-    <div class="issue-card">
-      <div class="issue-row">
-        <label for="issue-mng" style="font-weight:800">MNG 선택</label>
-        <select id="issue-mng"></select>
-      </div>
-      <div class="issue-grid">
-        <div class="issue-row">
-          <label style="font-weight:800">사용자</label>
-          <input id="issue-user" type="text" placeholder="이름">
-        </div>
-        <div class="issue-row">
-          <label style="font-weight:800">불출자</label>
-          <input id="issue-issuer" type="text" placeholder="자동 입력" disabled>
-        </div>
-      </div>
-      <div class="issue-row">
-        <label style="font-weight:800">위치</label>
-        <input id="issue-region" type="text" placeholder="예: 강남">
-      </div>
-      <div class="issue-submit">
-        <button class="btn-issue" onclick="submitIssue()">불출</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
