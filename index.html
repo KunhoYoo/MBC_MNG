@@ -177,12 +177,24 @@
       refreshIssueDropdown();
     };
 
+    
     window.showHistory = function(num){
       const arr = histories && histories[num] ? histories[num] : [];
       if (!arr.length){ alert(`<${num} 과거 기록>\n기록이 없습니다.`); return; }
-      const lines = arr.map(e => `${e.vj||'-'} / ${e.audio||'-'} / ${e.region||'-'} / ${formatKTime(new Date(e.returnedAt))} 반납`);
+      const safeTime = (ts)=>{
+        if (!ts) return '-';
+        const d = new Date(ts);
+        return isNaN(d) ? '-' : formatKTime(d);
+      };
+      const lines = arr.map(e => {
+        const ts = e.returnedAt || e.issuedAt;
+        const action = e.returnedAt ? '반납' : (e.issuedAt ? '불출' : '');
+        const timeStr = safeTime(ts);
+        return `${e.vj||'-'} / ${e.audio||'-'} / ${e.region||'-'} / ${timeStr} ${action}`;
+      });
       alert(`<${num} 과거 기록>\n` + lines.join('\n'));
     };
+
 
     function populateFromSnapshot(data){
       // do NOT rebuild table; only set input values & state
