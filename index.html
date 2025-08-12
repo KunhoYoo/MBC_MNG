@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>MNG 인제스트 노트</title>
+  <title>MNG 현황판</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Barun+Gothic&display=swap" rel="stylesheet">
 
@@ -24,7 +24,51 @@
     const db = getDatabase(app);
 
     // ==== State ====
-    const CODE_TO_USER = { "dbrjsgh": "유건호" }; // 한글 키패드 '유건호'
+    const CODE_TO_USER = {
+  "dbrjsgh": "유건호",
+  "rlatmdals": "김승민",
+  "dlwlsgks": "이진한",
+  "rlawodnd": "김재웅",
+  "didguswls": "양현진",
+  "fbtmdgh": "류승호",
+  "vuswoghks": "편재환",
+  "rlaalswns": "김민준",
+  "wjdgnldyd": "정휘용",
+  "wjdwlgur": "정지혁",
+  "rladudwls": "김영진",
+  "rlawotmd": "김재승",
+  "rlaxowns": "김태준",
+  "qorcksgus": "백찬현",
+  "dlgusdyd": "이현용",
+  "tlaalswns": "심민준",
+  "qkrwndud": "박주영",
+  "dlwogk": "이재하",
+  "dlalstkd": "이민상",
+  "ckalsdnr": "차민욱",
+  "rlawhddns": "김종운",
+  "dksghdcks": "안홍찬",
+  "qkrwogud": "박재형",
+  "dydalswnd": "용민중",
+  "dbstjrwns": "윤석준",
+  "quswnsgml": "변준희",
+  "qkrgustn": "박현수",
+  "rnjsehddh": "권동오",
+  "ghdtjddh": "홍성오",
+  "rlarudgus": "김경현",
+  "rnjswlsaud": "권진명",
+  "dlghkswns": "이환준",
+  "didguswns": "양현준",
+  "dlgkswns": "이한준",
+  "tlswpdyd": "신제용",
+  "wkdtpdnjs": "정세원",
+  "rlaalsrb": "김민규",
+  "dldPeh": "이예도",
+  "qkralscks": "박민찬",
+  "rlathdgus": "김송현",
+  "qkrwjdejr": "박정덕",
+  "wkdwodms": "장재은",
+  "wkddudrms": "장영근"
+}; // 한글 키패드 '유건호'
     const MNG_NUMBERS = [1,2,3,4,6,7,8,9,17,18,19,20,21,22,23,24,25,26,27];
     const mngList = MNG_NUMBERS.map(n => ({ num: `MNG-${String(n).padStart(2,'0')}`, vj:'', audio:'', region:'' }));
     let histories = {};
