@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>MNG 현황판 (실시간 토스트 알림 통합)</title>
+  <title>MNG 현황판</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Barun+Gothic&display=swap" rel="stylesheet">
   <style>
@@ -403,6 +403,13 @@
             setData: (path, value) => set(ref(db, path), value),
             startListeners: () => {
               if(dataListenersStarted) return;
+			  
+			  // ✅ 첫 로그인 시점 이전의 과거 알림은 무시
+			  const nowTs = Date.now();
+			  if (lastSeen.issue === 0 && lastSeen.ret === 0) {
+				lastSeen.issue = nowTs;
+				lastSeen.ret   = nowTs;
+			  }  
               onValue(ref(db,'mngData'), snap => populateFromSnapshot(snap.val()));
               onValue(ref(db,'mngHistory'), snap => { histories = snap.val() || {}; });
               // 실시간 알림 구독
