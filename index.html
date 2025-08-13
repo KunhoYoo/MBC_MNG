@@ -91,7 +91,38 @@
     .log-item{padding:10px 12px;border:1px solid #E6EBF2;border-radius:12px;background:#F8FAFF}
     .log-meta{font-size:12px;color:#5B6C80}
     .btn-row{display:flex;justify-content:flex-end;gap:8px}
-  </style>
+  
+/* Log 버튼 색상 연하게 */
+#btn-log {
+  background-color: #f4f8fc; /* 기존보다 연한 파랑톤 배경 */
+  color: #1477C9;           /* 글자색은 유지 */
+  border-color: #c5ddf3;    /* 테두리 연하게 */
+}
+#btn-log:hover {
+  background-color: #e9f2fa;
+}
+/* 로고와 Log 버튼 사이 간격 줄이기 */
+.top-actions {
+  margin-top: -10px;  /* 위로 조금 당김 */
+  margin-bottom: 8px; /* 표와의 간격은 유지 */
+}
+
+/* === tighten gap between title logo and Log button === */
+img.logo {
+  margin-bottom: 4px; /* 기본 간격보다 줄임 */
+}
+.container {
+  padding-top: 0; /* 위쪽 여백 제거 */
+}
+
+/* === extreme reduction: logo and Log button nearly aligned === */
+img.logo {
+  margin-bottom: 0; /* remove bottom gap */
+}
+.top-actions {
+  margin-top: -20px; /* pull buttons upward near logo */
+}
+</style>
 </head>
 <body>
   <div id="login-page" class="screen active">
