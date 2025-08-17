@@ -27,6 +27,8 @@
     .btn{padding:12px 14px;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:var(--brand);color:#fff;box-shadow:var(--shadow)}
     .btn.secondary{background:#fff;color:var(--brand);border:1px solid var(--brand)}
     .btn.small{padding:10px 12px;font-size:14px;border-radius:10px}
+    .btn.danger{background:#ef4444;color:#fff;border:1px solid #ef4444}
+    .btn.danger:hover{filter:brightness(.95)}
     .login-footer{margin-top:6px;text-align:center;color:var(--muted);font-weight:700}
     .tables-grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media (min-width:1024px){.tables-grid{grid-template-columns:1fr 1fr}}
@@ -56,22 +58,14 @@
     .issue-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .issue-submit{display:block}
     .btn-issue{width:100%;padding:12px 14px;border:none;border-radius:12px;cursor:pointer;font-weight:600;background:linear-gradient(180deg,#1e6fd1,#1159b2);color:#fff;box-shadow:var(--shadow)}
-    /* 현황판 상단 테이블 가운데 정렬 */
     #status-page table thead th { text-align: center; }
-    /* 상단 우측 Log 버튼 래퍼 */
-    .top-actions{display:flex;justify-content:flex-end;align-items:center;margin-bottom:12px;gap:8px}
-    /* Toast stack */
-    .toasts{
-      position:fixed; right:20px; bottom:20px; z-index:9999;
-      display:flex; flex-direction:column; align-items:flex-end; gap:10px;
-      max-width:calc(100vw - 40px);
-    }
-    .toast{
-      background:#13253a; color:#fff; border-radius:14px; padding:14px 16px;
-      box-shadow:0 18px 40px rgba(0,0,0,.22);
-      display:flex; align-items:flex-start; gap:10px; min-width:260px; max-width:360px;
-      opacity:0; transform:translateY(10px) scale(.98); animation:toast-in .25s ease forwards;
-    }
+    .top-actions{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px}
+    .top-times{display:none;flex-direction:column;align-items:flex-start;color:#335; font-weight:700;}
+    .top-times .time{font-size:14px;white-space:nowrap;margin-bottom:4px;}
+    .top-times .label{color:#5B6C80;font-weight:800;margin-right:6px}
+    @media (min-width:1024px){ .top-times{display:flex} }
+    .toasts{position:fixed; right:20px; bottom:20px; z-index:9999; display:flex; flex-direction:column; align-items:flex-end; gap:10px; max-width:calc(100vw - 40px);}
+    .toast{background:#13253a; color:#fff; border-radius:14px; padding:14px 16px; box-shadow:0 18px 40px rgba(0,0,0,.22); display:flex; align-items:flex-start; gap:10px; min-width:260px; max-width:360px; opacity:0; transform:translateY(10px) scale(.98); animation:toast-in .25s ease forwards;}
     .toast .dot{width:14px;height:14px;border-radius:999px;margin-top:4px;flex:none}
     .toast.issue .dot{background:#10B981}
     .toast.return .dot{background:#3B82F6}
@@ -80,8 +74,6 @@
     .toast-close{margin-left:auto;background:transparent;border:none;color:#9fb4cc;font-weight:800;cursor:pointer}
     @keyframes toast-in{to{opacity:1;transform:translateY(0) scale(1)}}
     @keyframes toast-out{to{opacity:0;transform:translateY(10px) scale(.98)}}
-
-    /* Log 모달 */
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;align-items:center;justify-content:center;z-index:9998}
     .modal[aria-hidden="false"]{display:flex}
     .modal-card{width:min(720px,92vw);max-height:min(80vh,840px);overflow:auto;background:#fff;border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow);padding:16px;display:grid;gap:12px}
@@ -91,38 +83,12 @@
     .log-item{padding:10px 12px;border:1px solid #E6EBF2;border-radius:12px;background:#F8FAFF}
     .log-meta{font-size:12px;color:#5B6C80}
     .btn-row{display:flex;justify-content:flex-end;gap:8px}
-  
-/* Log 버튼 색상 연하게 */
-#btn-log {
-  background-color: #f4f8fc; /* 기존보다 연한 파랑톤 배경 */
-  color: #1477C9;           /* 글자색은 유지 */
-  border-color: #c5ddf3;    /* 테두리 연하게 */
-}
-#btn-log:hover {
-  background-color: #e9f2fa;
-}
-/* 로고와 Log 버튼 사이 간격 줄이기 */
-.top-actions {
-  margin-top: -10px;  /* 위로 조금 당김 */
-  margin-bottom: 8px; /* 표와의 간격은 유지 */
-}
-
-/* === tighten gap between title logo and Log button === */
-img.logo {
-  margin-bottom: 4px; /* 기본 간격보다 줄임 */
-}
-.container {
-  padding-top: 0; /* 위쪽 여백 제거 */
-}
-
-/* === extreme reduction: logo and Log button nearly aligned === */
-img.logo {
-  margin-bottom: 0; /* remove bottom gap */
-}
-.top-actions {
-  margin-top: -20px; /* pull buttons upward near logo */
-}
-</style>
+    #btn-log { background-color: #f4f8fc; color: #1477C9; border-color: #c5ddf3; }
+    #btn-log:hover { background-color: #e9f2fa; }
+    .top-actions { margin-top: -20px; margin-bottom: 8px; }
+    img.logo { margin-bottom: 0; }
+    .container { padding-top: 0; }
+  </style>
 </head>
 <body>
   <div id="login-page" class="screen active">
@@ -143,6 +109,10 @@ img.logo {
     <img src="title_logo.png" class="logo" alt="타이틀 로고" onclick="toLogin()">
     <div class="container">
       <div class="top-actions">
+        <div class="top-times" aria-live="polite">
+          <div class="time"><span class="label">현재시간</span><span id="now-time">-</span></div>
+          <div class="time"><span class="label">업데이트</span><span id="update-time">-</span></div>
+        </div>
         <button id="btn-log" class="btn secondary small" type="button" title="최근 기록 보기">Log</button>
       </div>
       <div class="tables-grid">
@@ -189,7 +159,6 @@ img.logo {
     </div>
   </div>
 
-  <!-- Log 모달 -->
   <div id="log-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="log-title">
     <div class="modal-card">
       <div class="modal-head">
@@ -198,182 +167,109 @@ img.logo {
       </div>
       <div id="log-list" class="log-list" aria-live="polite"></div>
       <div class="btn-row">
+        <button id="btn-log-clear" class="btn small danger" type="button">Log 전체 삭제</button>
         <button id="btn-log-download" class="btn small" type="button">텍스트 다운로드</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast stack & audio -->
   <div id="toasts" class="toasts" aria-live="polite" aria-atomic="true"></div>
   <audio id="alarm-audio" src="alarm.mp3" preload="auto"></audio>
 
   <script>
-    // ===== Safety: isolate all code to avoid premature errors =====
     (function(){
-      // ----- App State & Utils -----
-      const CODE_TO_USER = {
-  "dbrjsgh": "유건호",  "rlawnsgml":"김준희",  "dlwlgns":"이지훈",  "gkstldn":"한시우",  "didtmdghks":"양승환",
-  "wjseowns":"전대준",  "dlgmdfyd":"이흥룡",  "tlscjfdks":"신철안",  "wlstkdgns":"진상훈",  "rlaxogy":"김태효",
-  "dlwhdgur":"이종혁",  "rlatmdals": "김승민",  "dlwlsgks": "이진한",  "rlawodnd": "김재웅",  "didguswls": "양현진",
-  "fbtmdgh": "류승호",  "vuswoghks": "편재환",  "rlaalswns": "김민준",  "wjdgnldyd": "정휘용",  "wjdwlgur": "정지혁",
-  "rladudwls": "김영진",  "rlawotmd": "김재승",  "rlaxowns": "김태준",  "qorcksgus": "백찬현",  "dlgusdyd": "이현용",
-  "tlaalswns": "심민준",  "qkrwndud": "박주영",  "dlwogk": "이재하",  "dlalstkd": "이민상",  "ckalsdnr": "차민욱",
-  "rlawhddns": "김종운",  "dksghdcks": "안홍찬",  "qkrwogud": "박재형",  "dydalswnd": "용민중",  "dbstjrwns": "윤석준",
-  "quswnsgml": "변준희",  "qkrgustn": "박현수",  "rnjsehddh": "권동오",  "ghdtjddh": "홍성오",  "rlarudgus": "김경현",
-  "rnjswlsaud": "권진명",  "dlghkswns": "이환준",  "didguswns": "양현준",  "dlgkswns": "이한준",  "tlswpdyd": "신제용",
-  "wkdtpdnjs": "정세원",  "rlaalsrb": "김민규",  "dldPeh": "이예도",  "qkralscks": "박민찬",  "rlathdgus": "김송현",
-  "qkrwjdejr": "박정덕",  "wkdwodms": "장재은",  "wkddudrms": "장영근"
-      };
+      const CODE_TO_USER = {"dbrjsgh":"유건호","rlawnsgml":"김준희","dlwlgns":"이지훈","gkstldn":"한시우","didtmdghks":"양승환","wjseowns":"전대준","dlgmdfyd":"이흥룡","tlscjfdks":"신철안","wlstkdgns":"진상훈","rlaxogy":"김태효","dlwhdgur":"이종혁","rlatmdals":"김승민","dlwlsgks":"이진한","rlawodnd":"김재웅","didguswls":"양현진","fbtmdgh":"류승호","vuswoghks":"편재환","rlaalswns":"김민준","wjdgnldyd":"정휘용","wjdwlgur":"정지혁","rladudwls":"김영진","rlawotmd":"김재승","rlaxowns":"김태준","qorcksgus":"백찬현","dlgusdyd":"이현용","tlaalswns":"심민준","qkrwndud":"박주영","dlwogk":"이재하","dlalstkd":"이민상","ckalsdnr":"차민욱","rlawhddns":"김종운","dksghdcks":"안홍찬","qkrwogud":"박재형","dydalswnd":"용민중","dbstjrwns":"윤석준","quswnsgml":"변준희","qkrgustn":"박현수","rnjsehddh":"권동오","ghdtjddh":"홍성오","rlarudgus":"김경현","rnjswlsaud":"권진명","dlghkswns":"이환준","didguswns":"양현준","dlgkswns":"이한준","tlswpdyd":"신제용","wkdtpdnjs":"정세원","rlaalsrb":"김민규","dldPeh":"이예도","qkralscks":"박민찬","rlathdgus":"김송현","qkrwjdejr":"박정덕","wkdwodms":"장재은","wkddudrms":"장영근"};
       const mapLower = Object.fromEntries(Object.entries(CODE_TO_USER).map(([k,v])=>[k.toLowerCase(), v]));
-      function getUserByCode(code){
-        if(!code) return null;
-        return mapLower[String(code).toLowerCase()] || null;
-      }
+      function getUserByCode(code){ if(!code) return null; return mapLower[String(code).toLowerCase()] || null; }
 
       const MNG_NUMBERS = [1,2,3,4,5,6,7,8,9,10,17,18,19,20,21,22,23,24,25,26];
       const mngList = MNG_NUMBERS.map(n=>({ num:`MNG-${String(n).padStart(2,'0')}`, vj:'', audio:'', region:'' }));
-      let histories = {};
-      let allLogs = []; // 전역 500개 누적
-      const LOG_LIMIT = 500;
-      const RECENT_SHOW = 20;
+      let histories = {}; let allLogs = []; const LOG_LIMIT = 500; const RECENT_SHOW = 20;
+      let currentUserName = ""; let intendedMode = "status"; let listenersAttached = false; let dataListenersStarted = false; let syncTimer = null; let firebaseReady = false; let DB = null;
 
-      let currentUserName = "";
-      let intendedMode = "status";
-      let listenersAttached = false;
-      let dataListenersStarted = false;
-      let syncTimer = null;
-      let firebaseReady = false;
-      let DB = null;
+      // 시간 표시(PC 전용)
+      let lastUpdateTs = 0;
+      const $now = () => document.getElementById('now-time');
+      const $upd = () => document.getElementById('update-time');
+      const DOW_KR = ['일','월','화','수','목','금','토'];
+      const p = (x)=>String(x).padStart(2,'0');
+      function kstNow(){ const now = new Date(); const kstString = now.toLocaleString('en-US',{ timeZone:'Asia/Seoul' }); return new Date(kstString); }
+      function formatKRFull(dt){ const y=dt.getFullYear(), m=p(dt.getMonth()+1), d=p(dt.getDate()); const hh=p(dt.getHours()), mm=p(dt.getMinutes()), ss=p(dt.getSeconds()); const wd = DOW_KR[dt.getDay()]; return `${y}-${m}-${d}(${wd}) ${hh}:${mm}:${ss}`; }
+      function renderTimes(){ const n=$now(); if(n){ n.textContent = formatKRFull(kstNow()); } const u=$upd(); if(u){ u.textContent = lastUpdateTs ? formatKRFull(new Date(lastUpdateTs)) : '-'; } }
+      setInterval(renderTimes, 1000);
 
-      // Toast state
-      const TOAST_LIFETIME = 6000; // 6초
-      let lastSeen = { issue: 0, ret: 0 };
-      function playAlarm(){
-        try{
-          const a = new Audio(document.getElementById('alarm-audio').src);
-          a.volume = 1.0;
-          a.play().catch(()=>{});
-        }catch(e){}
-      }
+      const TOAST_LIFETIME = 6000; let lastSeen = { issue: 0, ret: 0 };
+      function playAlarm(){ try{ const a = new Audio(document.getElementById('alarm-audio').src); a.volume=1.0; a.play().catch(()=>{});}catch(e){} }
       function showToast(kind, title, desc){
-        const t = document.createElement('div');
-        t.className = `toast ${kind}`;
-        t.innerHTML = `<div class="dot"></div>
-          <div style="flex:1 1 auto">
-            <div class="title">${title}</div>
-            <p class="desc">${desc}</p>
-          </div>
-          <button class="toast-close" aria-label="닫기">×</button>`;
-        const stack = document.getElementById('toasts');
-        stack && stack.prepend(t);
-        const closer = t.querySelector('.toast-close');
-        const remove = ()=>{ t.style.animation='toast-out .2s ease forwards'; setTimeout(()=>t.remove(), 200); };
-        closer && closer.addEventListener('click', remove);
-        playAlarm();
-        setTimeout(remove, TOAST_LIFETIME);
+        const t = document.createElement('div'); t.className = `toast ${kind}`;
+        t.innerHTML = `<div class="dot"></div><div style="flex:1 1 auto"><div class="title">${title}</div><p class="desc">${desc}</p></div><button class="toast-close" aria-label="닫기">×</button>`;
+        const stack=document.getElementById('toasts'); stack && stack.prepend(t);
+        const closer=t.querySelector('.toast-close'); const remove=()=>{ t.style.animation='toast-out .2s ease forwards'; setTimeout(()=>t.remove(),200); };
+        closer && closer.addEventListener('click', remove); playAlarm(); setTimeout(remove, TOAST_LIFETIME);
       }
 
       function isUsed(item){ return Boolean((item.vj||'').trim() || (item.audio||'').trim() || (item.region||'').trim()); }
-      function pad2(x){ return String(x).padStart(2,'0'); }
-      function formatKTime(d){
-        const p=x=>String(x).padStart(2,'0');
-        return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}시${p(d.getMinutes())}분`;
-      }
-      function formatKDateOnly(d){
-        const p=x=>String(x).padStart(2,'0');
-        return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
-      }
-      function kstNow(){
-        const now = new Date();
-        const kstString = now.toLocaleString('en-US',{ timeZone:'Asia/Seoul' });
-        return new Date(kstString);
-      }
       function rowEl(num){ return document.querySelector(`tr[data-num="${num}"]`); }
-      function setRowClass(num){
-        const item = mngList.find(m=>m.num===num); const r = rowEl(num); if(!r||!item) return;
-        r.classList.toggle('used', isUsed(item)); r.classList.toggle('unused', !isUsed(item));
-        const chip = r.querySelector('.chip'); if(chip){ chip.classList.toggle('chip-used', isUsed(item)); chip.classList.toggle('chip-idle', !isUsed(item)); }
-      }
-      function toLogin(){
-        document.getElementById('status-page').style.display='none';
-        document.getElementById('issue-page').style.display='none';
-        const lp = document.getElementById('login-page');
-        lp.style.display='flex'; lp.classList.add('active');
-        window.scrollTo({top:0, behavior:'auto'});
-      }
+      function setRowClass(num){ const item=mngList.find(m=>m.num===num); const r=rowEl(num); if(!r||!item) return; r.classList.toggle('used', isUsed(item)); r.classList.toggle('unused', !isUsed(item)); const chip=r.querySelector('.chip'); if(chip){ chip.classList.toggle('chip-used', isUsed(item)); chip.classList.toggle('chip-idle', !isUsed(item)); } }
+
+      function toLogin(){ document.getElementById('status-page').style.display='none'; document.getElementById('issue-page').style.display='none'; const lp=document.getElementById('login-page'); lp.style.display='flex'; lp.classList.add('active'); window.scrollTo({top:0,behavior:'auto'}); }
       window.toLogin = toLogin;
 
       function buildTableOnce(){
-        const tbodyLeft  = document.getElementById('mng-left');
-        const tbodyRight = document.getElementById('mng-right');
-        if (!tbodyLeft || !tbodyRight) return;
-        tbodyLeft.innerHTML=''; tbodyRight.innerHTML='';
-        const isMobile = window.matchMedia('(max-width:1023px)').matches;
-        mngList.forEach((item, idx)=>{
-          const tr = document.createElement('tr'); tr.dataset.num=item.num; tr.className=isUsed(item)?'used':'unused';
-          tr.innerHTML = `
-            <td class="left-stamp"><button class="chip ${isUsed(item)?'chip-used':'chip-idle'}" data-history="${item.num}">${item.num}</button></td>
+        const tbodyLeft=document.getElementById('mng-left'); const tbodyRight=document.getElementById('mng-right'); if(!tbodyLeft||!tbodyRight) return;
+        tbodyLeft.innerHTML=''; tbodyRight.innerHTML=''; const isMobile=window.matchMedia('(max-width:1023px)').matches;
+        mngList.forEach((item,idx)=>{
+          const tr=document.createElement('tr'); tr.dataset.num=item.num; tr.className=isUsed(item)?'used':'unused';
+          tr.innerHTML=`<td class="left-stamp"><button class="chip ${isUsed(item)?'chip-used':'chip-idle'}" data-history="${item.num}">${item.num}</button></td>
             <td><input type="text" data-field="vj" placeholder="이름" value="${item.vj||''}"></td>
             <td><input type="text" data-field="audio" placeholder="이름" value="${item.audio||''}"></td>
             <td><input type="text" data-field="region" placeholder="예: 강남" value="${item.region||''}"></td>
             <td class="action-cell"><button class="reset" data-reset="${item.num}" title="반납(초기화)" aria-label="반납">⟲</button></td>`;
           (isMobile || idx<10 ? tbodyLeft : tbodyRight).appendChild(tr);
         });
-        if (!listenersAttached){
-          [tbodyLeft, tbodyRight].forEach(tbody=>{
-            tbody.addEventListener('input', (e)=>{
-              const inp = e.target.closest('input[data-field]'); if(!inp) return;
-              const tr = e.target.closest('tr'); if(!tr) return;
-              const num = tr.dataset.num; const field = inp.dataset.field;
-              const item = mngList.find(m=>m.num===num); if(!item) return;
+        if(!listenersAttached){
+          [tbodyLeft,tbodyRight].forEach(tbody=>{
+            tbody.addEventListener('input',e=>{
+              const inp=e.target.closest('input[data-field]'); if(!inp) return;
+              const tr=e.target.closest('tr'); if(!tr) return; const num=tr.dataset.num; const field=inp.dataset.field; const item=mngList.find(m=>m.num===num); if(!item) return;
               item[field]=inp.value; setRowClass(num); refreshIssueDropdown();
             });
-            tbody.addEventListener('click', async (e)=>{
-              const resetBtn = e.target.closest('button[data-reset]');
-              if (resetBtn){
-                const num = resetBtn.dataset.reset; const item = mngList.find(m=>m.num===num); if(!item) return;
-                if (!confirm('해당 MNG 반납처리 하시겠습니까?')) return;
-                if (isUsed(item)){ await appendHistory(num, { vj:item.vj||'', audio:item.audio||'', region:item.region||'', returnedAt:new Date().toISOString() }); }
-                const prev = { vj:item.vj||'', audio:item.audio||'', region:item.region||'' };
-                item.vj=item.audio=item.region='';
-                const tr = rowEl(num); if(tr){ tr.querySelectorAll('input').forEach(i=>i.value=''); }
-                setRowClass(num);
-                const nowTs = Date.now();
+            tbody.addEventListener('click',async e=>{
+              const resetBtn=e.target.closest('button[data-reset]');
+              if(resetBtn){
+                const num=resetBtn.dataset.reset; const item=mngList.find(m=>m.num===num); if(!item) return;
+                if(!confirm('해당 MNG 반납처리 하시겠습니까?')) return;
+                if(isUsed(item)){ await appendHistory(num,{ vj:item.vj||'', audio:item.audio||'', region:item.region||'', returnedAt:new Date().toISOString() }); }
+                const prev={ vj:item.vj||'', audio:item.audio||'', region:item.region||'' };
+                item.vj=item.audio=item.region=''; const tr=rowEl(num); if(tr){ tr.querySelectorAll('input').forEach(i=>i.value=''); } setRowClass(num);
+                const nowTs=Date.now();
                 if(firebaseReady){
                   await DB.setData(`mngData/${num}`, { vj:'', audio:'', region:'' });
                   await DB.setData('lastReturn', { mng:num, user:'-', region:'-', returnedBy: currentUserName || '(알수없음)', ts: nowTs });
-                  const newLog = { type:'return', mng:num, user:prev.vj||'-', region:prev.region||'-', by: currentUserName || '(알수없음)', ts: nowTs };
-                  const updated = [newLog, ...(allLogs||[])].slice(0, LOG_LIMIT);
-                  allLogs = updated;
-                  await DB.setData('globalLog', updated);
+                  const newLog={ type:'return', mng:num, user:prev.vj||'-', region:prev.region||'-', by: currentUserName || '(알수없음)', ts: nowTs };
+                  const updated=[newLog, ...(allLogs||[])].slice(0, LOG_LIMIT); allLogs=updated; await DB.setData('globalLog', updated);
                 }
                 refreshIssueDropdown(); return;
               }
-              const histBtn = e.target.closest('button[data-history]');
-              if (histBtn){
-                const num = histBtn.dataset.history;
-                const arr = histories && histories[num] ? histories[num] : [];
-                if (!arr.length){ alert(`<${num} 과거 기록>\n기록이 없습니다.`); return; }
-                const safeTime = ts => { if(!ts) return '-'; const d=new Date(ts); return isNaN(d)?'-':formatKTime(d); };
-                const lines = arr.map(e => {
-                  const ts = e.returnedAt || e.issuedAt; const action = e.returnedAt ? '반납' : (e.issuedAt ? '불출' : '');
-                  return `${e.vj||'-'} / ${e.audio||'-'} / ${e.region||'-'} / ${safeTime(ts)} ${action}`;
-                });
+              const histBtn=e.target.closest('button[data-history]');
+              if(histBtn){
+                const num=histBtn.dataset.history; const arr=histories && histories[num] ? histories[num] : [];
+                if(!arr.length){ alert(`<${num} 과거 기록>\\n기록이 없습니다.`); return; }
+                const safeTime = ts => { if(!ts) return '-'; const d=new Date(ts); return isNaN(d)?'-':`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}시${p(d.getMinutes())}분`; };
+                const lines = arr.map(e => { const ts=e.returnedAt||e.issuedAt; const action=e.returnedAt?'반납':(e.issuedAt?'불출':''); return `${e.vj||'-'} / ${e.audio||'-'} / ${e.region||'-'} / ${safeTime(ts)} ${action}`; });
                 alert(`<${num} 과거 기록>\n` + lines.join('\n'));
               }
             });
           });
-          listenersAttached = true;
+          listenersAttached=true;
         }
       }
 
       function populateFromSnapshot(data){
         mngList.forEach(item=>{
           if(data && data[item.num]){ Object.assign(item, data[item.num]); }
-          const r = rowEl(item.num); if(!r) return;
-          const vj=r.querySelector('input[data-field="vj"]');
-          const au=r.querySelector('input[data-field="audio"]');
-          const re=r.querySelector('input[data-field="region"]');
+          const r=rowEl(item.num); if(!r) return;
+          const vj=r.querySelector('input[data-field="vj"]'); const au=r.querySelector('input[data-field="audio"]'); const re=r.querySelector('input[data-field="region"]');
           if(vj && vj!==document.activeElement) vj.value=item.vj||'';
           if(au && au!==document.activeElement) au.value=item.audio||'';
           if(re && re!==document.activeElement) re.value=item.region||'';
@@ -383,93 +279,48 @@ img.logo {
       }
 
       function buildIssueDropdown(all=true){
-        const sel = document.getElementById('issue-mng'); if(!sel) return;
+        const sel=document.getElementById('issue-mng'); if(!sel) return;
         sel.innerHTML='<option value="" disabled selected>선택</option>';
         MNG_NUMBERS.forEach(n=>{
-          const label = `MNG-${String(n).padStart(2,'0')}`;
-          if(!all){
-            const item = mngList.find(m=>m.num===label);
-            if(item && isUsed(item)) return;
-          }
+          const label=`MNG-${String(n).padStart(2,'0')}`;
+          if(!all){ const item=mngList.find(m=>m.num===label); if(item && isUsed(item)) return; }
           const opt=document.createElement('option'); opt.value=label; opt.textContent=label; sel.appendChild(opt);
         });
       }
       function refreshIssueDropdown(){ buildIssueDropdown(false); }
 
-      async function appendHistory(num, entry){
-        const arr = histories[num] ? [...histories[num]] : [];
-        arr.unshift(entry); histories[num] = arr.slice(0,5);
-        if(firebaseReady){ await DB.setData(`mngHistory/${num}`, histories[num]); }
-      }
+      async function appendHistory(num, entry){ const arr=histories[num] ? [...histories[num]] : []; arr.unshift(entry); histories[num]=arr.slice(0,5); if(firebaseReady){ await DB.setData(`mngHistory/${num}`, histories[num]); } }
 
       async function submitIssue(){
-        const sel=document.getElementById('issue-mng');
-        const userEl=document.getElementById('issue-user');
-        const regionEl=document.getElementById('issue-region');
-        if(!sel) return;
-        const mng=sel.value; const user=(userEl?.value||'').trim(); const region=(regionEl?.value||'').trim();
-        if(!mng){ alert('MNG를 선택해주세요.'); return; }
-        if(!user){ alert('사용자 이름을 입력해주세요.'); return; }
-        if(!region){ alert('위치를 입력해주세요.'); return; }
-        await appendHistory(mng, { vj:user, audio: currentUserName || '', region, issuedAt: new Date().toISOString() });
-        const nowTs = Date.now();
+        const sel=document.getElementById('issue-mng'); const userEl=document.getElementById('issue-user'); const regionEl=document.getElementById('issue-region');
+        if(!sel) return; const mng=sel.value; const user=(userEl?.value||'').trim(); const region=(regionEl?.value||'').trim();
+        if(!mng){ alert('MNG를 선택해주세요.'); return; } if(!user){ alert('사용자 이름을 입력해주세요.'); return; } if(!region){ alert('위치를 입력해주세요.'); return; }
+        await appendHistory(mng,{ vj:user, audio: currentUserName || '', region, issuedAt:new Date().toISOString() });
+        const nowTs=Date.now();
         if(firebaseReady){
           await DB.setData(`mngData/${mng}`, { vj:user, audio: currentUserName || '', region });
           await DB.setData('lastIssue', { mng, user, region, issuedBy: currentUserName || '(알수없음)', ts: nowTs });
-          const newLog = { type:'issue', mng, user, region, by: currentUserName || '(알수없음)', ts: nowTs };
-          const updated = [newLog, ...(allLogs||[])].slice(0, LOG_LIMIT);
-          allLogs = updated;
-          await DB.setData('globalLog', updated);
+          const newLog={ type:'issue', mng, user, region, by: currentUserName || '(알수없음)', ts: nowTs };
+          const updated=[newLog, ...(allLogs||[])].slice(0, LOG_LIMIT); allLogs=updated; await DB.setData('globalLog', updated);
         }
         alert('불출 되었습니다!'); if(userEl) userEl.value=''; if(regionEl) regionEl.value=''; refreshIssueDropdown();
       }
 
-      function showScreen(id){
-        const lp = document.getElementById('login-page');
-        const sp = document.getElementById('status-page');
-        const ip = document.getElementById('issue-page');
-        if(!lp || !sp || !ip) return;
-        lp.style.display = id==='login' ? 'flex':'none';
-        sp.style.display = id==='status' ? 'block':'none';
-        ip.style.display = id==='issue'  ? 'block':'none';
-        if(id==='login'){ lp.classList.add('active'); }
-        window.scrollTo({top:0, behavior:'auto'});
+      function showScreen(id){ const lp=document.getElementById('login-page'); const sp=document.getElementById('status-page'); const ip=document.getElementById('issue-page');
+        lp.style.display = id==='login' ? 'flex':'none'; sp.style.display = id==='status' ? 'block':'none'; ip.style.display = id==='issue' ? 'block':'none';
+        if(id==='login'){ lp.classList.add('active'); } window.scrollTo({top:0,behavior:'auto'});
       }
-
-      function safeBind(id, event, handler){
-        const el = document.getElementById(id);
-        if(el) el.addEventListener(event, handler, { passive:false });
-      }
-
+      function safeBind(id,event,handler){ const el=document.getElementById(id); if(el) el.addEventListener(event, handler, { passive:false }); }
       function attachLoginHandlers(){
-        const codeInput=document.getElementById('login-code');
-        const btnStatus=document.getElementById('btn-login-status');
-        const btnIssue=document.getElementById('btn-login-issue');
-        const btnIssueSubmit=document.getElementById('btn-issue-submit');
-
-        // 상단 Log
+        const codeInput=document.getElementById('login-code'); const btnStatus=document.getElementById('btn-login-status'); const btnIssue=document.getElementById('btn-login-issue'); const btnIssueSubmit=document.getElementById('btn-issue-submit');
         safeBind('btn-log','click', openLogModal);
-
         function chooseMode(m){ intendedMode=m; }
         function login(){
-          const code = (codeInput?.value||'').trim();
-          const name = getUserByCode(code);
-          if(name){
-            currentUserName = name;
-            if(intendedMode==='issue'){
-              showScreen('issue');
-              buildIssueDropdown(false);
-              const issuer=document.getElementById('issue-issuer'); if(issuer) issuer.value=currentUserName||'';
-              if(firebaseReady && !dataListenersStarted){ DB.startListeners(); }
-            }else{
-              showScreen('status');
-              buildTableOnce();
-              if(firebaseReady && !dataListenersStarted){ DB.startListeners(); }
-              if(firebaseReady && !syncTimer){ syncTimer=setInterval(()=>DB.syncAll(), 5000); }
-            }
-          }else{
-            alert('잘못된 로그인 코드입니다.');
-          }
+          const code=(codeInput?.value||'').trim(); const name=getUserByCode(code);
+          if(name){ currentUserName=name;
+            if(intendedMode==='issue'){ showScreen('issue'); buildIssueDropdown(false); const issuer=document.getElementById('issue-issuer'); if(issuer) issuer.value=currentUserName||''; if(firebaseReady && !dataListenersStarted){ DB.startListeners(); } }
+            else{ showScreen('status'); buildTableOnce(); if(firebaseReady && !dataListenersStarted){ DB.startListeners(); } if(firebaseReady && !syncTimer){ syncTimer=setInterval(()=>DB.syncAll(), 5000); } }
+          }else{ alert('잘못된 로그인 코드입니다.'); }
         }
         btnStatus && btnStatus.addEventListener('click', (e)=>{ e.preventDefault(); chooseMode('status'); login(); });
         btnIssue  && btnIssue.addEventListener('click',  (e)=>{ e.preventDefault(); chooseMode('issue');  login(); });
@@ -477,137 +328,99 @@ img.logo {
         codeInput && codeInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); chooseMode('status'); login(); } });
       }
 
-      // ----- Log 모달 & 다운로드 -----
+      // Log 모달 & 다운로드 & 전체 삭제
       function renderLogList(){
-        const list = document.getElementById('log-list');
-        if(!list) return;
-        list.innerHTML = '';
-        const recent = (allLogs||[]).slice(0, RECENT_SHOW);
-        if(!recent.length){
-          const empty = document.createElement('div');
-          empty.className = 'log-item';
-          empty.textContent = '표시할 기록이 없습니다.';
-          list.appendChild(empty);
-          return;
-        }
+        const list=document.getElementById('log-list'); if(!list) return; list.innerHTML='';
+        const recent=(allLogs||[]).slice(0,RECENT_SHOW);
+        if(!recent.length){ const empty=document.createElement('div'); empty.className='log-item'; empty.textContent='표시할 기록이 없습니다.'; list.appendChild(empty); return; }
         for(const e of recent){
-          const d = new Date(e.ts||Date.now());
-          const item = document.createElement('div');
-          item.className = 'log-item';
-          const actionText = e.type==='issue' ? '불출' : '반납';
-          item.innerHTML = `
-            <div><b>${e.mng}</b> · ${actionText}</div>
-            <div class="log-meta">${formatKTime(d)} · 사용자: ${e.user || '-'} · 위치: ${e.region || '-'} · 처리자: ${e.by || '-'}</div>
-          `;
+          const d=new Date(e.ts||Date.now()); const actionText=e.type==='issue'?'불출':'반납';
+          const item=document.createElement('div'); item.className='log-item';
+          item.innerHTML=`<div><b>${e.mng}</b> · ${actionText}</div><div class="log-meta">${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}시${p(d.getMinutes())}분 · 사용자: ${e.user||'-'} · 위치: ${e.region||'-'} · 처리자: ${e.by||'-'}</div>`;
           list.appendChild(item);
         }
       }
-      function openLogModal(){
-        const modal = document.getElementById('log-modal');
-        if(!modal) return;
-        renderLogList();
-        modal.setAttribute('aria-hidden','false');
-      }
-      function closeLogModal(){
-        const modal = document.getElementById('log-modal');
-        if(!modal) return;
-        modal.setAttribute('aria-hidden','true');
+      function openLogModal(){ const modal=document.getElementById('log-modal'); if(!modal) return; renderLogList(); modal.setAttribute('aria-hidden','false'); }
+      function closeLogModal(){ const modal=document.getElementById('log-modal'); if(!modal) return; modal.setAttribute('aria-hidden','true'); }
+      async function clearAllLogs(){
+        const pw = window.prompt('Log 전체 삭제 비밀번호를 입력하세요:\\n(삭제 후 되돌릴 수 없습니다)');
+        if(pw !== 'mbcmngreset'){
+          if(pw !== null) alert('비밀번호가 올바르지 않습니다.');
+          return;
+        }
+        try{
+          if(firebaseReady && DB){
+            await DB.setData('globalLog', []);
+            await DB.setData('mngHistory', {});
+            await DB.setData('lastIssue', null);
+            await DB.setData('lastReturn', null);
+          }
+          allLogs = [];
+          histories = {};
+          lastUpdateTs = 0;
+          renderTimes();
+          renderLogList();
+          window.alert('Log가 모두 삭제되었습니다.');
+        }catch(err){
+          console.error(err); window.alert('삭제 중 오류가 발생했습니다.');
+        }
       }
       function buildTxtFromLogs(entries){
-        const lines = ['# MNG Global Log (최신순, 최대 500개)'];
+        const lines=['# MNG Global Log (최신순, 최대 500개)'];
         for(const e of entries){
-          const d = new Date(e.ts||Date.now());
-          const yyyy = d.getFullYear(); const MM = pad2(d.getMonth()+1); const dd = pad2(d.getDate()); const HH = pad2(d.getHours()); const mm = pad2(d.getMinutes()); const ss = pad2(d.getSeconds());
-          const actionText = e.type==='issue' ? '불출' : '반납';
-          lines.push(`${yyyy}-${MM}-${dd} ${HH}:${mm}:${ss} | ${e.mng} | ${actionText} | 사용자:${e.user||'-'} | 위치:${e.region||'-'} | 처리자:${e.by||'-'}`);
+          const d=new Date(e.ts||Date.now());
+          const p2=n=>String(n).padStart(2,'0');
+          const actionText=e.type==='issue'?'불출':'반납';
+          lines.push(`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())} | ${e.mng} | ${actionText} | 사용자:${e.user||'-'} | 위치:${e.region||'-'} | 처리자:${e.by||'-'}`);
         }
-        return lines.join('\n');
+        return lines.join('\\n');
       }
       function downloadLogTxt(){
-        const kst = kstNow();
-        const datePart = formatKDateOnly(kst);
-        const filename = `${datePart}_MNG_log.txt`;
-        const content = buildTxtFromLogs((allLogs||[]).slice(0, LOG_LIMIT));
-        const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = filename;
-        document.body.appendChild(a); a.click(); a.remove();
-        URL.revokeObjectURL(url);
+        const d=kstNow(); const p2=n=>String(n).padStart(2,'0');
+        const filename=`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}_MNG_log.txt`;
+        const blob=new Blob([buildTxtFromLogs((allLogs||[]).slice(0,LOG_LIMIT))],{type:'text/plain;charset=utf-8'});
+        const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
       }
 
-      // Run after DOM
-      window.addEventListener('DOMContentLoaded', ()=>{
+      window.addEventListener('DOMContentLoaded',()=>{
         try{
           attachLoginHandlers();
-          const btnClose = document.getElementById('btn-log-close');
-          const btnDl = document.getElementById('btn-log-download');
+          // Wire modal footer buttons
+          const btnClose=document.getElementById('btn-log-close');
+          const btnDl=document.getElementById('btn-log-download');
+          const btnClr=document.getElementById('btn-log-clear');
           btnClose && btnClose.addEventListener('click', closeLogModal);
           btnDl && btnDl.addEventListener('click', downloadLogTxt);
+          btnClr && btnClr.addEventListener('click', clearAllLogs);
 
-          showScreen('login');
-          buildTableOnce(); // prepares empty table
-
-          // Dynamic import Firebase wrapped in try/catch so it never blocks UI
+          showScreen('login'); buildTableOnce(); renderTimes();
+          // Firebase lazy-load
           (async ()=>{
             try{
               const [{ initializeApp }, { getDatabase, ref, set, onValue }] = await Promise.all([
                 import('https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js'),
                 import('https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js')
               ]);
-              const firebaseConfig = {
-                apiKey: "AIzaSyADWorIbKPZZoWx7qAriiCA2lYtf-MSdAA",
-                authDomain: "mbc-mng.firebaseapp.com",
-                databaseURL: "https://mbc-mng-default-rtdb.firebaseio.com",
-                projectId: "mbc-mng",
-                storageBucket: "mbc-mng.firebasestorage.app",
-                messagingSenderId: "845487713315",
-                appId: "1:845487713315:web:d8559559fa98870fde5596"
-              };
-              const app = initializeApp(firebaseConfig);
-              const db = getDatabase(app);
-
+              const firebaseConfig = { apiKey:"AIzaSyADWorIbKPZZoWx7qAriiCA2lYtf-MSdAA", authDomain:"mbc-mng.firebaseapp.com", databaseURL:"https://mbc-mng-default-rtdb.firebaseio.com", projectId:"mbc-mng", storageBucket:"mbc-mng.firebasestorage.app", messagingSenderId:"845487713315", appId:"1:845487713315:web:d8559559fa98870fde5596" };
+              const app = initializeApp(firebaseConfig); const db = getDatabase(app);
               DB = {
-                setData: (path, value) => set(ref(db, path), value),
+                setData:(path,value)=>set(ref(db,path),value),
                 startListeners: () => {
                   if(dataListenersStarted) return;
-                  const nowTs = Date.now();
-                  if (lastSeen.issue === 0 && lastSeen.ret === 0) {
-                    lastSeen.issue = nowTs;
-                    lastSeen.ret   = nowTs;
-                  }
+                  const nowTs=Date.now(); if(lastSeen.issue===0 && lastSeen.ret===0){ lastSeen.issue=nowTs; lastSeen.ret=nowTs; }
                   onValue(ref(db,'mngData'), snap => populateFromSnapshot(snap.val()));
                   onValue(ref(db,'mngHistory'), snap => { histories = snap.val() || {}; });
-                  onValue(ref(db,'globalLog'), snap => { allLogs = snap.val() || []; });
-                  onValue(ref(db,'lastIssue'), snap => {
-                    const v = snap.val(); if(!v) return;
-                    if(document.getElementById('status-page').style.display !== 'block') return;
-                    if(v.ts && v.ts <= lastSeen.issue) return;
-                    lastSeen.issue = v.ts || Date.now();
-                    showToast('issue', '새 불출 알림', `${v.issuedBy}님이 ${v.mng}를 불출했습니다<br>${v.user} / ${v.region}`);
-                  });
-                  onValue(ref(db,'lastReturn'), snap => {
-                    const v = snap.val(); if(!v) return;
-                    if(document.getElementById('status-page').style.display !== 'block') return;
-                    if(v.ts && v.ts <= lastSeen.ret) return;
-                    lastSeen.ret = v.ts || Date.now();
-                    showToast('return', '반납 알림', `${v.returnedBy}님이 ${v.mng}를 반납했습니다`);
-                  });
+                  onValue(ref(db,'globalLog'), snap => { allLogs = snap.val() || []; if(allLogs.length && allLogs[0].ts){ lastUpdateTs = Math.max(lastUpdateTs, allLogs[0].ts); renderTimes(); } });
+                  onValue(ref(db,'lastIssue'), snap => { const v=snap.val(); if(!v) return; if(document.getElementById('status-page').style.display!=='block') return; if(v.ts && v.ts <= lastSeen.issue) return; lastSeen.issue=v.ts||Date.now(); lastUpdateTs=Math.max(lastUpdateTs,lastSeen.issue); renderTimes(); showToast('issue','새 불출 알림',`${v.issuedBy}님이 ${v.mng}를 불출했습니다<br>${v.user} / ${v.region}`); });
+                  onValue(ref(db,'lastReturn'), snap => { const v=snap.val(); if(!v) return; if(document.getElementById('status-page').style.display!=='block') return; if(v.ts && v.ts <= lastSeen.ret) return; lastSeen.ret=v.ts||Date.now(); lastUpdateTs=Math.max(lastUpdateTs,lastSeen.ret); renderTimes(); showToast('return','반납 알림',`${v.returnedBy}님이 ${v.mng}를 반납했습니다`); });
                   dataListenersStarted = true;
                 },
-                syncAll: () => {
-                  const obj={}; mngList.forEach(it => obj[it.num] = { vj:it.vj||'', audio:it.audio||'', region:it.region||'' });
-                  set(ref(db,'mngData'), obj);
-                }
+                syncAll: () => { const obj={}; mngList.forEach(it=>obj[it.num]={ vj:it.vj||'', audio:it.audio||'', region:it.region||'' }); set(ref(db,'mngData'), obj); }
               };
               firebaseReady = true;
-            }catch(err){
-              console.error('Firebase 로드 실패:', err);
-            }
+            }catch(err){ console.error('Firebase 로드 실패:', err); }
           })();
-        }catch(e){
-          console.error('초기화 오류:', e);
-        }
+        }catch(e){ console.error('초기화 오류:', e); }
       });
     })();
   </script>
