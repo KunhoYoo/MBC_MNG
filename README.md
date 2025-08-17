@@ -1,4 +1,4 @@
-# 📡 MBC MNG 현황판
+# 📡 MBC MNG 현황판 https://kunhoyoo.github.io/MBC_MNG/
 
 MNG 장비의 **불출/반납 현황 관리**를 위한 웹 기반 현황판입니다.  
 Firebase Realtime Database 를 백엔드로 사용하며, 현황판 UI, 불출 등록, 로그 기록/다운로드 등의 기능을 제공합니다.
@@ -35,7 +35,7 @@ Firebase Realtime Database 를 백엔드로 사용하며, 현황판 UI, 불출 �
   - 현재 로그를 `.txt` 파일로 내려받기 가능.
 - **Log 전체 삭제**:
   - 관리자 전용 기능.
-  - 비밀번호 입력(`mbcmngreset`) 시 모든 로그 및 히스토리 초기화.
+  - 비밀번호 입력시 모든 로그 및 히스토리 초기화.
   - Firebase `globalLog`, `mngHistory`, `lastIssue`, `lastReturn` 전부 초기화.
   - 로컬 상태도 초기화되어 **즉시 반영**됨.
 
@@ -62,4 +62,3 @@ Firebase Realtime Database 를 백엔드로 사용하며, 현황판 UI, 불출 �
 - **Frontend**: HTML, CSS, JavaScript (Vanilla)
 - **Backend(DB)**: Firebase Realtime Database
 - **Deploy**: 정적 호스팅 가능 (Firebase Hosting, GitHub Pages 등)
-https://kunhoyoo.github.io/MBC_MNG/
