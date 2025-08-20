@@ -90,74 +90,52 @@
     .container { padding-top: 0; }
   </style>
 
-  <style id="mobile-compact-tweaks">
-    /* === Ultra-narrow mobile tweaks (≤380px) ===
-       목표:
-       1) 344px 폭에서도 텍스트 최소 3글자 이상 보이도록 입력칸 가독성 유지
-       2) 폰트 크기 과도 축소 방지 + 패딩/여백은 컴팩트화
-       3) 리셋/칩 버튼 터치 타깃 크기 보장
-    */
-    @media (max-width: 380px) {
-      :root { --control-h: 44px; }
+<style id="mobile-compact-tweaks-v5">
+/* 초협폭(≤380px): 3글자+ (예: “예 : 강남역”) 한 줄 표시 목표 */
+@media (max-width:380px){
+  table{ table-layout: fixed; width:100%; }
+  thead th{ padding: 6px 6px !important; }
+  tbody td{ padding: 4px 6px !important; }
 
-      body { font-size: 14px; } /* 전체 폰트 바닥선 상향 */
+  input[type="text"]{
+    height: 30px;
+    font-size: clamp(11.5px, 3.1vw, 13px);
+    padding: 0 6px;
+    width: 100%;
+    box-sizing: border-box;
+    min-inline-size: 6.2ch;       /* 기본 최소 3글자 확보 */
+    border-radius: 9px;
+  }
+  /* 위치(4번째) 칸: '예 : 강남역'까지 한 줄로 보이게 폭 여유 ↑ */
+  td:nth-child(4) input[type="text"]{ min-inline-size: 7.8ch; }
 
-      /* 헤더/셀 여백은 컴팩트, 폰트는 바닥선 유지 */
-      thead th {
-        font-size: 13px;
-        padding: 8px 8px;
-      }
-      tbody td {
-        padding: 6px 6px;
-      }
+  .chip{ padding: 2px 7px; font-size: 12px; }
+  .reset{ width: 32px; height: 32px; min-width:32px; min-height:32px; }
+  td:last-child .reset{ margin-left: 4px; }
 
-      /* No./반납 너비는 고정, 중간 3열은 가변(입력칸에 공간 배정) */
-      thead th:first-child { width: 98px !important; } /* No. */
-      thead th:last-child  { width: 58px !important; text-align: center; } /* 반납 */
-      thead th:nth-child(2),
-      thead th:nth-child(3),
-      thead th:nth-child(4) { width: auto !important; }
+  /* 컬럼 폭 가드: 양끝을 v4보다 2px씩 더 축소 */
+  thead th:first-child{ width: 86px !important; }  /* No. */
+  thead th:last-child{ width: 52px !important; }   /* 반납 */
+}
 
-      /* 칩(번호표) 터치 크기/가독성 확보 */
-      .chip {
-        font-size: 13px;
-        padding: 4px 8px;
-        min-height: 32px;
-      }
+/* 381–480px: 동일 컨셉, 위치 칸 더 넉넉히 */
+@media (min-width:381px) and (max-width:480px){
+  table{ table-layout: fixed; width:100%; }
+  tbody td{ padding: 5px 7px !important; }
+  input[type="text"]{
+    height: 32px;
+    font-size: clamp(12.5px, 3.0vw, 14px);
+    padding: 0 6px;
+    min-inline-size: 6.5ch;
+  }
+  td:nth-child(4) input[type="text"]{ min-inline-size: 7.8ch; }
 
-      /* 입력칸: 글자 최소 3~4자 보장 + 과도한 축소 방지  */
-      input[type="text"] {
-        height: 34px;
-        font-size: clamp(13px, 3.9vw, 15px);
-        min-inline-size: 6ch;  /* 'ch' 기준으로 최소 가로 폭 확보 (한글/영문 혼용 대비 여유치) */
-        padding: 0 10px;
-        border-radius: 10px;
-      }
-
-      /* 반납 버튼 터치 타깃 */
-      .reset {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-        min-height: 34px;
-      }
-
-      /* 상단 레이아웃/로고 간격 컴팩트 */
-      .top-actions { margin-top: -12px; margin-bottom: 6px; }
-      img.logo { margin-top: 8px; margin-bottom: 0; max-width: 260px; }
-      .container { padding-left: 8px; padding-right: 8px; }
-    }
-
-    /* 381~480px 구간도 살짝 상향 조정 (가독성 유지) */
-    @media (min-width: 381px) and (max-width: 480px) {
-      input[type="text"] {
-        font-size: clamp(13px, 3.2vw, 15px);
-        min-inline-size: 6ch;
-      }
-      .chip { font-size: 13px; }
-      .reset { width: 34px; height: 34px; }
-    }
-  </style>
+  .chip{ padding: 2px 8px; font-size: 12.5px; }
+  .reset{ width: 33px; height: 33px; }
+  thead th:first-child{ width: 90px !important; }
+  thead th:last-child{ width: 54px !important; }
+}
+</style>
 </head>
 <body>
   <div id="login-page" class="screen active">
