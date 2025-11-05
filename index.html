@@ -1,475 +1,480 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>MNG 현황판</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <link href="https://fonts.googleapis.com/css2?family=Nanum+Barun+Gothic&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --brand:#1477C9; --brand-soft:#E7F1FB; --ink:#0F172A; --muted:#5B6C80;
-      --line:#E6EBF2; --bg:#F6F9FD; --card:#FFFFFF; --success:#16A34A;
-      --shadow:0 10px 30px rgba(20,119,201,.08); --control-h:48px;
-    }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{font-family:'Nanum Barun Gothic',system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif;background:var(--bg);color:var(--ink);margin:0}
-    img.logo{cursor:pointer;max-width:360px;width:min(58%,360px);display:block;margin:10px auto 3px}
-    #login-page,#status-page,#issue-page{display:none;width:100%}
-    #login-page.active{display:flex} .screen{width:100%}
-    .container{max-width:1200px;margin:0 auto;padding:16px;position:relative}
-    #login-page{min-height:100vh;align-items:center;justify-content:center;flex-direction:column;padding:24px}
-    .login-card{width:min(680px,92vw);background:var(--card);padding:22px;border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--line)}
-    .login-grid{display:grid;grid-template-columns:1fr;gap:12px}
-    .login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .field{width:100%;height:var(--control-h);padding:0 16px;border:1px solid var(--line);border-radius:12px;font-size:16px;background:#fff;outline:none}
-    input.field:focus,select.field:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(20,119,201,.15)}
-    select.field{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:linear-gradient(45deg,transparent 50%,#8593a6 50%),linear-gradient(135deg,#8593a6 50%,transparent 50%);background-position:calc(100% - 20px) calc(50% - 3px),calc(100% - 15px) calc(50% - 3px);background-size:8px 8px,8px 8px;background-repeat:no-repeat}
-    .btn{padding:12px 14px;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:var(--brand);color:#fff;box-shadow:var(--shadow)}
-    .btn.secondary{background:#fff;color:var(--brand);border:1px solid var(--brand)}
-    .btn.small{padding:10px 12px;font-size:14px;border-radius:10px}
-    .btn.danger{background:#ef4444;color:#fff;border:1px solid #ef4444}
-    .btn.danger:hover{filter:brightness(.95)}
-    .login-footer{margin-top:6px;text-align:center;color:var(--muted);font-weight:700}
-    .tables-grid{display:grid;grid-template-columns:1fr;gap:16px}
-    @media (min-width:1024px){.tables-grid{grid-template-columns:1fr 1fr}}
-    @media (max-width:1023px){.table-wrap.right{display:none}}
-    .table-wrap{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
-    table{width:100%;border-collapse:collapse;table-layout:fixed}
-    thead th{background:linear-gradient(180deg,var(--brand-soft),#F3F8FF);color:#133559;font-weight:800;font-size:14px;letter-spacing:.2px;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2;white-space:nowrap}
-    thead th:first-child{width:110px}
-    thead th:nth-child(2),thead th:nth-child(3),thead th:nth-child(4){width:28%}
-    thead th:last-child{width:90px;text-align:center}
-    tbody tr{border-bottom:1px solid var(--line);background:#fff}
-    tbody tr.used td.left-stamp{border-left:6px solid var(--success)}
-    tbody tr.unused td.left-stamp{border-left:6px solid #CBD5E1}
-    tbody td{padding:8px 10px;vertical-align:middle}
-    tbody td:last-child{text-align:center}
-    .chip{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;font-weight:800;font-size:13px;border:1px solid var(--line);background:#fff;cursor:pointer}
-    .chip-used{border-color:rgba(22,163,74,.45);background:linear-gradient(180deg,#E7F7EE,#F3FBF6);color:#065F46}
-    .chip-idle{border-color:#E5E7EB;background:#F8FAFC;color:#334155}
-    input[type="text"]{width:100%;height:38px;padding:0 12px;border:1px solid #D7DFEA;border-radius:12px;font-size:14px;outline:none;background:#fff}
-    input[type="text"]::placeholder{color:#9DA8B8}
-    input[type="text"]:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(20,119,201,.12)}
-    .reset{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5;cursor:pointer}
-    @media (max-width:720px){.container{padding:10px} thead th{font-size:13px;padding:9px 10px} tbody td{padding:7px 8px} .chip{font-size:12px;padding:5px 8px} .reset{width:32px;height:32px} input[type="text"]{height:34px}}
-    @media (max-width:480px){thead th{font-size:12px} th,td{padding-left:6px;padding-right:6px} td:nth-child(1){width:84px} td:nth-child(5){width:56px} input[type="text"]{height:32px;font-size:12px;padding:0 8px;border-radius:10px} .chip{padding:5px 8px;font-size:12px} .reset{width:34px;height:34px;min-width:34px;min-height:34px}}
-    .issue-card{max-width:560px;margin:24px auto;background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:18px;display:grid;gap:12px}
-    .issue-row{display:grid;gap:8px}
-    .issue-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .issue-submit{display:block}
-    .btn-issue{width:100%;padding:12px 14px;border:none;border-radius:12px;cursor:pointer;font-weight:600;background:linear-gradient(180deg,#1e6fd1,#1159b2);color:#fff;box-shadow:var(--shadow)}
-    #status-page table thead th { text-align: center; }
-    .top-actions{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px}
-    .top-times{display:none;flex-direction:column;align-items:flex-start;color:#335; font-weight:700;}
-    .top-times .time{font-size:14px;white-space:nowrap;margin-bottom:4px;}
-    .top-times .label{color:#5B6C80;font-weight:800;margin-right:6px}
-    @media (min-width:1024px){ .top-times{display:flex} }
-    .toasts{position:fixed; right:20px; bottom:20px; z-index:9999; display:flex; flex-direction:column; align-items:flex-end; gap:10px; max-width:calc(100vw - 40px);}
-    .toast{background:#13253a; color:#fff; border-radius:14px; padding:14px 16px; box-shadow:0 18px 40px rgba(0,0,0,.22); display:flex; align-items:flex-start; gap:10px; min-width:260px; max-width:360px; opacity:0; transform:translateY(10px) scale(.98); animation:toast-in .25s ease forwards;}
-    .toast .dot{width:14px;height:14px;border-radius:999px;margin-top:4px;flex:none}
-    .toast.issue .dot{background:#10B981}
-    .toast.return .dot{background:#3B82F6}
-    .toast .title{font-weight:800;margin:0 0 4px 0}
-    .toast .desc{margin:0;color:#E6EDF6;font-size:14px;line-height:1.35}
-    .toast-close{margin-left:auto;background:transparent;border:none;color:#9fb4cc;font-weight:800;cursor:pointer}
-    @keyframes toast-in{to{opacity:1;transform:translateY(0) scale(1)}}
-    @keyframes toast-out{to{opacity:0;transform:translateY(10px) scale(.98)}}
-    .modal{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;align-items:center;justify-content:center;z-index:9998}
-    .modal[aria-hidden="false"]{display:flex}
-    .modal-card{width:min(720px,92vw);max-height:min(80vh,840px);overflow:auto;background:#fff;border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow);padding:16px;display:grid;gap:12px}
-    .modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .modal-title{font-weight:800;font-size:18px;color:#0b2b52}
-    .log-list{display:grid;gap:8px}
-    .log-item{padding:10px 12px;border:1px solid #E6EBF2;border-radius:12px;background:#F8FAFF}
-    .log-meta{font-size:12px;color:#5B6C80}
-    .btn-row{display:flex;justify-content:flex-end;gap:8px}
-    #btn-log { background-color: #f4f8fc; color: #1477C9; border-color: #c5ddf3; }
-    #btn-log:hover { background-color: #e9f2fa; }
-    .top-actions { margin-top: -20px; margin-bottom: 8px; }
-    img.logo { margin-bottom: 0; }
-    .container { padding-top: 0; }
-  </style>
-
-<style id="mobile-compact-tweaks-v5">
-/* 초협폭(≤380px): 3글자+ (예: “예 : 강남역”) 한 줄 표시 목표 */
-@media (max-width:380px){
-  table{ table-layout: fixed; width:100%; }
-  thead th{ padding: 6px 6px !important; }
-  tbody td{ padding: 4px 6px !important; }
-
-  input[type="text"]{
-    height: 30px;
-    font-size: clamp(11.5px, 3.1vw, 13px);
-    padding: 0 6px;
-    width: 100%;
-    box-sizing: border-box;
-    min-inline-size: 6.2ch;       /* 기본 최소 3글자 확보 */
-    border-radius: 9px;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>MBC MNG 현황판</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Barun+Gothic&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#1477C9; --ink:#0f172a; --bg:#F6F9FD; --card:#ffffff; --line:#E6EBF2;
+    --row-h:34px; --gap:6px; --label-w:86px;
+    --base:#F3F4F6; --overseas:#E6F7EA; --bureau:#FFF9DB;
+    --ret:#ffd6e5; --ret2:#ffc2d9;
   }
-  /* 위치(4번째) 칸: '예 : 강남역'까지 한 줄로 보이게 폭 여유 ↑ */
-  td:nth-child(4) input[type="text"]{ min-inline-size: 7.8ch; }
-
-  .chip{ padding: 2px 7px; font-size: 12px; }
-  .reset{ width: 32px; height: 32px; min-width:32px; min-height:32px; }
-  td:last-child .reset{ margin-left: 4px; }
-
-  /* 컬럼 폭 가드: 양끝을 v4보다 2px씩 더 축소 */
-  thead th:first-child{ width: 86px !important; }  /* No. */
-  thead th:last-child{ width: 52px !important; }   /* 반납 */
-}
-
-/* 381–480px: 동일 컨셉, 위치 칸 더 넉넉히 */
-@media (min-width:381px) and (max-width:480px){
-  table{ table-layout: fixed; width:100%; }
-  tbody td{ padding: 5px 7px !important; }
-  input[type="text"]{
-    height: 32px;
-    font-size: clamp(12.5px, 3.0vw, 14px);
-    padding: 0 6px;
-    min-inline-size: 6.5ch;
-  }
-  td:nth-child(4) input[type="text"]{ min-inline-size: 7.8ch; }
-
-  .chip{ padding: 2px 8px; font-size: 12.5px; }
-  .reset{ width: 33px; height: 33px; }
-  thead th:first-child{ width: 90px !important; }
-  thead th:last-child{ width: 54px !important; }
-}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nanum Barun Gothic', system-ui, -apple-system, Segoe UI, Roboto, 'Apple SD Gothic Neo','Noto Sans KR', sans-serif}
+  .hidden{display:none!important}
+  .center{display:flex;align-items:center;justify-content:center}
+  .btn{padding:8px 12px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+  .btn.small{padding:6px 10px;border-radius:9px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-return{display:block;width:92%;height:24px;line-height:24px;margin:3px auto 1px;border-radius:10px;border:1px solid #f4a8bd;background:var(--ret);color:#9a1849;font-weight:700;cursor:pointer;font-size:11px}
+  .btn-return:hover{background:var(--ret2)}
+  /* 로그인 */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center}
+  .login-card{width:min(560px,94vw);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(20,119,201,.06);padding:18px}
+  .title-logo{max-width:340px;width:min(70%,340px);display:block;margin:4px auto 10px;cursor:pointer}
+  .login-row{display:flex;gap:8px;justify-content:center}
+  .login-input{width:60%;height:40px;border:1px solid #ccd7e6;border-radius:10px;padding:0 10px}
+  /* 현황판 래퍼 */
+  .board-wrap{width:min(1600px,98vw);margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(20,119,201,.06);padding:8px;position:relative}
+  .topbar{position:absolute;left:0;right:0;top:8px;display:flex;justify-content:center;align-items:center;pointer-events:none}
+  .topbar img{height:28px; pointer-events:auto; cursor:pointer}
+  .issue-fab{position:absolute;right:10px;top:10px;pointer-events:auto}
+  .issue-fab .btn.small{cursor:pointer}
+  .meta{position:absolute;left:8px;top:8px;width:220px}
+  .meta div{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;margin-bottom:6px;font-size:12px;color:#334}
+  .grid-container{margin-top:62px}
+  .grid{display:grid;grid-template-columns: var(--label-w) repeat(var(--cols), 1fr);gap:var(--gap)}
+  .cell{height:var(--row-h);border:1px solid var(--line);border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;padding:2px 6px;overflow:hidden}
+  .title{font-weight:800;color:#334155;background:#fbfcff;font-size:12px}
+  .hdr{height:46px;font-weight:900;color:#133559;background:#fff;flex-direction:column;padding:4px}
+  .mng-hdr{display:flex;flex-direction:column;line-height:1.05;align-items:center}
+  .mng-name{font-size:12px;font-weight:900}
+  .mng-os{font-size:10px;color:#64748b}
+  .cell input{width:100%;height:26px;border:1px solid transparent;border-radius:8px;text-align:center;font-size:12px;background:#fff}
+  .cell input:focus{outline:none;border-color:#1477C9;box-shadow:0 0 0 3px rgba(20,119,201,.12)}
+  .rowgap{height:6px}
+  /* 우측 로그사이드 */
+  .side{position:fixed;right:0;top:0;height:100vh;width:min(420px,92vw);background:#fff;border-left:1px solid #e5e7eb;box-shadow:-8px 0 24px rgba(0,0,0,.08);
+        transform:translateX(100%);transition:transform .25s ease;z-index:50;display:flex;flex-direction:column}
+  .side.show{transform:translateX(0)}
+  .side-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #eef2f7}
+  .side-body{padding:10px 14px;overflow:auto}
+  .log-item{padding:8px 0;border-bottom:1px dashed #e5e7eb;font-size:13px;color:#334}
+  .close-x{background:#fff;border:1px solid #cdd7e5;border-radius:8px;padding:6px 8px;cursor:pointer}
+  /* 모달 */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:70}
+  .modal.show{display:flex}
+  .modal-card{width:min(860px,96vw);background:#fff;border-radius:14px;border:1px solid #e6ebf2;box-shadow:0 12px 32px rgba(0,0,0,.25);padding:14px}
+  /* 토스트 */
+  .toast-wrap{position:fixed;right:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;z-index:60}
+  .toast{background:#111;color:#fff;padding:10px 12px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px;opacity:.95}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
-  <div id="login-page" class="screen active">
-    <img src="title_logo.png" class="logo" alt="타이틀 로고" onclick="toLogin()">
-    <div class="login-card">
-      <div class="login-grid">
-        <input id="login-code" type="password" class="field" placeholder="코드를 입력하세요" autocomplete="current-password" inputmode="text">
-        <div class="login-actions">
-          <button id="btn-login-status" class="btn" type="button">현황</button>
-          <button id="btn-login-issue" class="btn secondary" type="button">불출</button>
-        </div>
-        <div class="login-footer">MNG 현황 최신화 잘 부탁드립니다 📡</div>
-      </div>
+<audio id="alarm" src="alarm.mp3" preload="auto"></audio>
+
+<!-- 로그인 -->
+<div id="login">
+  <div class="login-card">
+    <img src="title_logo.png" class="title-logo" alt="타이틀" onclick="show('login')" />
+    <div class="login-row">
+      <input id="login-code" type="password" placeholder="로그인 코드" class="login-input" />
+      <button class="btn" onclick="go()">로그인</button>
     </div>
   </div>
+</div>
 
-  <div id="status-page" class="screen">
-    <img src="title_logo.png" class="logo" alt="타이틀 로고" onclick="toLogin()">
-    <div class="container">
-      <div class="top-actions">
-        <div class="top-times" aria-live="polite">
-          <div class="time"><span class="label">현재시간</span><span id="now-time">-</span></div>
-          <div class="time"><span class="label">업데이트</span><span id="update-time">-</span></div>
-        </div>
-        <button id="btn-log" class="btn secondary small" type="button" title="최근 기록 보기">Log</button>
-      </div>
-      <div class="tables-grid">
-        <div class="table-wrap left">
-          <table>
-            <thead><tr><th>No.</th><th>사용자</th><th>불출자</th><th>위치</th><th>반납</th></tr></thead>
-            <tbody id="mng-left"></tbody>
-          </table>
-        </div>
-        <div class="table-wrap right">
-          <table>
-            <thead><tr><th>No.</th><th>사용자</th><th>불출자</th><th>위치</th><th>반납</th></tr></thead>
-            <tbody id="mng-right"></tbody>
-          </table>
-        </div>
-      </div>
+<!-- 현황판 -->
+<div id="status" class="hidden">
+  <div class="board-wrap">
+    <div class="topbar"><img src="title_logo.png" alt="타이틀" onclick="show('login')" /></div>
+    <div class="issue-fab"><button class="btn small" style="margin-right:6px;background:#475569" onclick="captureBoard()">캡쳐</button><button class="btn small" id="issue-btn" onclick="openIssue()">불출</button></div>
+    <div class="meta"><div>🔄 <span id="updated">업데이트 없음</span></div></div>
+    <div class="grid-container">
+      <div id="grid-top" class="grid"></div>
+      <div class="rowgap"></div>
+      <div id="grid-bottom" class="grid"></div>
     </div>
   </div>
+</div>
 
-  <div id="issue-page" class="screen">
-    <img src="title_logo.png" class="logo" alt="타이틀 로고" onclick="toLogin()">
-    <div class="issue-card">
-      <div class="issue-row">
-        <label for="issue-mng" style="font-weight:800">MNG 선택</label>
-        <select id="issue-mng" class="field"></select>
-      </div>
-      <div class="issue-grid">
-        <div class="issue-row">
-          <label style="font-weight:800">사용자</label>
-          <input id="issue-user" type="text" class="field" placeholder="이름">
-        </div>
-        <div class="issue-row">
-          <label style="font-weight:800">불출자</label>
-          <input id="issue-issuer" type="text" class="field" placeholder="자동 입력" disabled>
-        </div>
-      </div>
-      <div class="issue-row">
-        <label style="font-weight:800">위치</label>
-        <input id="issue-region" type="text" class="field" placeholder="예: 강남">
-      </div>
-      <div class="issue-submit">
-        <button id="btn-issue-submit" class="btn-issue" type="button">불출</button>
-      </div>
+<!-- 불출 모달 -->
+<div id="issue-modal" class="modal">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-weight:900;color:#133559">불출</div>
+      <button class="close-x" onclick="closeIssue()">닫기</button>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center">
+      <div class="center" style="justify-content:flex-end;font-weight:800;color:#334155;font-size:13px">MNG</div>
+      <select id="iss-mng" style="height:34px;border:1px solid #ccd7e6;border-radius:8px;padding:0 8px"></select>
+
+      <div class="center" style="justify-content:flex-end;font-weight:800;color:#334155;font-size:13px">사용자</div>
+      <input id="iss-user" placeholder="" style="height:34px;border:1px solid #ccd7e6;border-radius:8px;padding:0 8px">
+
+      <div class="center" style="justify-content:flex-end;font-weight:800;color:#334155;font-size:13px">사용자 휴대폰</div>
+      <input id="iss-user-phone" value="" disabled style="height:34px;border:1px dashed #ccd7e6;border-radius:8px;padding:0 8px;background:#fafafa;text-align:center">
+
+      <div class="center" style="justify-content:flex-end;font-weight:800;color:#334155;font-size:13px">오디오맨</div>
+      <input id="iss-audio" placeholder="" style="height:34px;border:1px solid #ccd7e6;border-radius:8px;padding:0 8px">
+
+      <div class="center" style="justify-content:flex-end;font-weight:800;color:#334155;font-size:13px">오디오맨 휴대폰</div>
+      <input id="iss-audio-phone" value="" disabled style="height:34px;border:1px dashed #ccd7e6;border-radius:8px;padding:0 8px;background:#fafafa;text-align:center">
+
+      <div class="center" style="justify-content:flex-end;font-weight:800;color:#334155;font-size:13px">사용 위치</div>
+      <input id="iss-region" placeholder="" style="height:34px;border:1px solid #ccd7e6;border-radius:8px;padding:0 8px">
+
+      <div class="center" style="justify-content:flex-end;font-weight:800;color:#334155;font-size:13px">아이템</div>
+      <input id="iss-item" placeholder="" style="height:34px;border:1px solid #ccd7e6;border-radius:8px;padding:0 8px">
+
+      <div class="center" style="justify-content:flex-end;font-weight:800;color:#334155;font-size:13px">일정</div>
+      <select id="iss-status" style="height:34px;border:1px solid #ccd7e6;border-radius:8px;padding:0 8px">
+        <option value="base">기본 일정(연회색)</option>
+        <option value="overseas">해외 출장(연초록)</option>
+        <option value="bureau">지국(연노랑)</option>
+      </select>
+    </div>
+    <div style="display:flex;justify-content:center;margin-top:10px">
+      <button class="btn" onclick="submitIssue()">불출</button>
     </div>
   </div>
+</div>
 
-  <div id="log-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="log-title">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div class="modal-title" id="log-title">최근 20개 기록</div>
-        <button id="btn-log-close" class="btn secondary small" type="button" aria-label="닫기">닫기</button>
-      </div>
-      <div id="log-list" class="log-list" aria-live="polite"></div>
-      <div class="btn-row">
-        <button id="btn-log-clear" class="btn small danger" type="button">Log 전체 삭제</button>
-        <button id="btn-log-download" class="btn small" type="button">텍스트 다운로드</button>
-      </div>
-    </div>
+<!-- 로그 사이드 -->
+<aside id="side" class="side">
+  <div class="side-hdr">
+    <div><b id="side-title">MNG-?? 로그</b></div>
+    <button class="close-x" onclick="toggleSide(false)">닫기</button>
   </div>
+  <div id="side-body" class="side-body"></div>
+</aside>
 
-  <div id="toasts" class="toasts" aria-live="polite" aria-atomic="true"></div>
-  <audio id="alarm-audio" src="alarm.mp3" preload="auto"></audio>
+<div id="toasts" class="toast-wrap"></div>
 
-  <script>
-    (function(){
-      const CODE_TO_USER = {"dbrjsgh":"유건호","rlawnsgml":"김준희","dlwlgns":"이지훈","gkstldn":"한시우","didtmdghks":"양승환","wjseowns":"전대준","dlgmdfyd":"이흥룡","tlscjfdks":"신철안","wlstkdgns":"진상훈","rlaxogy":"김태효","dlwhdgur":"이종혁","rlatmdals":"김승민","dlwlsgks":"이진한","rlawodnd":"김재웅","didguswls":"양현진","fbtmdgh":"류승호","qodbstjq":"배윤섭","rlaxogy":"김태효","vuswoghks":"편재환","rlaalswns":"김민준","wjdgnldyd":"정휘용","wjdwlgur":"정지혁","rladudwls":"김영진","rlawotmd":"김재승","rlaxowns":"김태준","qorcksgus":"백찬현","dlgusdyd":"이현용","tlaalswns":"심민준","qkrwndud":"박주영","dlwogk":"이재하","dlalstkd":"이민상","ckalsdnr":"차민욱","rlawhddns":"김종운","dksghdcks":"안홍찬","qkrwogud":"박재형","dydalswnd":"용민중","dbstjrwns":"윤석준","quswnsgml":"변준희","qkrgustn":"박현수","rnjsehddh":"권동오","ghdtjddh":"홍성오","rlarudgus":"김경현","rnjswlsaud":"권진명","dlghkswns":"이환준","didguswns":"양현준","dlgkswns":"이한준","tlswpdyd":"신제용","wkdtpdnjs":"정세원","rlaalsrb":"김민규","dldPeh":"이예도","qkralscks":"박민찬","rlathdgus":"김송현","qkrwjdejr":"박정덕","wkdwodms":"장재은","wkddudrms":"장영근"};
-      const mapLower = Object.fromEntries(Object.entries(CODE_TO_USER).map(([k,v])=>[k.toLowerCase(), v]));
-      function getUserByCode(code){ if(!code) return null; return mapLower[String(code).toLowerCase()] || null; }
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, update, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
-      const MNG_NUMBERS = [1,2,3,4,5,6,7,8,9,10,17,18,19,20,21,22,23,24,25,26];
-      const mngList = MNG_NUMBERS.map(n=>({ num:`MNG-${String(n).padStart(2,'0')}`, vj:'', audio:'', region:'' }));
-      let histories = {}; let allLogs = []; const LOG_LIMIT = 500; const RECENT_SHOW = 20;
-      let currentUserName = ""; let intendedMode = "status"; let listenersAttached = false; let dataListenersStarted = false; let syncTimer = null; let firebaseReady = false; let DB = null;
+  // ===== Firebase Config (제공하신 값) =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyADWorIbKPZZoWx7qAriiCA2lYtf-MSdAA",
+    authDomain: "mbc-mng.firebaseapp.com",
+    databaseURL: "https://mbc-mng-default-rtdb.firebaseio.com",
+    projectId: "mbc-mng",
+    storageBucket: "mbc-mng.firebasestorage.app",
+    messagingSenderId: "845487713315",
+    appId: "1:845487713315:web:d8559559fa98870fde5596"
+  };
 
-      // 시간 표시(PC 전용)
-      let lastUpdateTs = 0;
-      const $now = () => document.getElementById('now-time');
-      const $upd = () => document.getElementById('update-time');
-      const DOW_KR = ['일','월','화','수','목','금','토'];
-      const p = (x)=>String(x).padStart(2,'0');
-      function kstNow(){ const now = new Date(); const kstString = now.toLocaleString('en-US',{ timeZone:'Asia/Seoul' }); return new Date(kstString); }
-      function formatKRFull(dt){ const y=dt.getFullYear(), m=p(dt.getMonth()+1), d=p(dt.getDate()); const hh=p(dt.getHours()), mm=p(dt.getMinutes()), ss=p(dt.getSeconds()); const wd = DOW_KR[dt.getDay()]; return `${y}-${m}-${d}(${wd}) ${hh}:${mm}:${ss}`; }
-      function renderTimes(){ const n=$now(); if(n){ n.textContent = formatKRFull(kstNow()); } const u=$upd(); if(u){ u.textContent = lastUpdateTs ? formatKRFull(new Date(lastUpdateTs)) : '-'; } }
-      setInterval(renderTimes, 1000);
+  let app = null, db = null; let ROLE='viewer'; // 'viewer' | 'editor'
+  try { app = initializeApp(firebaseConfig); db = getDatabase(app); }
+  catch(e){ console.warn('Firebase init skipped:', e); }
 
-      const TOAST_LIFETIME = 6000; let lastSeen = { issue: 0, ret: 0 };
-      function playAlarm(){ try{ const a = new Audio(document.getElementById('alarm-audio').src); a.volume=1.0; a.play().catch(()=>{});}catch(e){} }
-      function showToast(kind, title, desc){
-        const t = document.createElement('div'); t.className = `toast ${kind}`;
-        t.innerHTML = `<div class="dot"></div><div style="flex:1 1 auto"><div class="title">${title}</div><p class="desc">${desc}</p></div><button class="toast-close" aria-label="닫기">×</button>`;
-        const stack=document.getElementById('toasts'); stack && stack.prepend(t);
-        const closer=t.querySelector('.toast-close'); const remove=()=>{ t.style.animation='toast-out .2s ease forwards'; setTimeout(()=>t.remove(),200); };
-        closer && closer.addEventListener('click', remove); playAlarm(); setTimeout(remove, TOAST_LIFETIME);
+  const RTDB_URL = (firebaseConfig && firebaseConfig.databaseURL) ? firebaseConfig.databaseURL.replace(/\/+$/,'') : '';
+
+  async function saveStatus(id, payload){
+    const data = Object.assign({}, payload, { ts: serverTimestamp ? serverTimestamp() : null });
+    if(db){
+      try{ await set(ref(db, 'status/'+id), data); return true; }catch(e){ console.warn('SDK saveStatus failed', e); }
+    }
+    // REST fallback
+    if(RTDB_URL){
+      try{
+        const res = await fetch(`${RTDB_URL}/status/${id}.json`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+        return res.ok;
+      }catch(e){ console.warn('REST saveStatus failed', e); }
+    }
+    return false;
+  }
+
+  async function appendLog(id, entry){
+    const payload = Object.assign({}, entry, { ts: serverTimestamp ? serverTimestamp() : null });
+    if(db){
+      try{ await push(ref(db, 'logs/'+id), payload); return true; }catch(e){ console.warn('SDK appendLog failed', e); }
+    }
+    if(RTDB_URL){
+      try{
+        const res = await fetch(`${RTDB_URL}/logs/${id}.json`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(entry)});
+        return res.ok;
+      }catch(e){ console.warn('REST appendLog failed', e); }
+    }
+    return false;
+  }
+
+  // ===== 전화번호 매핑 (video.txt for 사용자 / audio.txt for 오디오맨) =====
+  const defaultPhone = "010-0000-0000";
+  const mapVideo = new Map(), mapAudio = new Map(); let mapsLoaded=false;
+  async function loadPhoneMaps(){
+    try {
+      const cb=Date.now();
+      const [v,a] = await Promise.allSettled([fetch('video.txt?cb='+cb), fetch('audio.txt?cb='+cb)]);
+      if(v.status==='fulfilled' && v.value.ok) parsePhoneFile(await v.value.text(), mapVideo);
+      if(a.status==='fulfilled' && a.value.ok) parsePhoneFile(await a.value.text(), mapAudio);
+      mapsLoaded=true;
+    } catch(e){ console.warn('phone map error', e); }
+  }
+  function parsePhoneFile(text, targetMap){
+    text.split(/\r?\n/).forEach(line=>{
+      const raw=line.trim(); if(!raw) return;
+      // name,number | name<TAB>number | name number
+      const m = raw.match(/^\s*([^,\t]+)[,\t\s]+([0-9\-\s]+)\s*$/);
+      if(!m) return;
+      const name = m[1].trim();
+      let digits = (m[2]||'').replace(/[^\d]/g,'');
+      if(!name || digits.length<10) return;
+      if(digits.length===10) digits='0'+digits;
+      if(digits.length===11){
+        const phone = digits.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3');
+        targetMap.set(name, phone);
       }
+    });
+  }
+  const getUserPhone = (name) => mapVideo.get((name||'').trim()) || defaultPhone;
+  const getAudioPhone= (name) => mapAudio.get((name||'').trim()) || defaultPhone;
 
-      function isUsed(item){ return Boolean((item.vj||'').trim() || (item.audio||'').trim() || (item.region||'').trim()); }
-      function rowEl(num){ return document.querySelector(`tr[data-num="${num}"]`); }
-      function setRowClass(num){ const item=mngList.find(m=>m.num===num); const r=rowEl(num); if(!r||!item) return; r.classList.toggle('used', isUsed(item)); r.classList.toggle('unused', !isUsed(item)); const chip=r.querySelector('.chip'); if(chip){ chip.classList.toggle('chip-used', isUsed(item)); chip.classList.toggle('chip-idle', !isUsed(item)); } }
+  // ===== 공통 함수 =====
+  function toast(msg){
+    const el=document.createElement('div'); el.className='toast'; el.textContent=msg;
+    document.getElementById('toasts').appendChild(el);
+    try{ const a=document.getElementById('alarm'); a.currentTime=0; a.play().catch(()=>{});}catch(_){}
+    setTimeout(()=>el.style.opacity='0',1800); setTimeout(()=>el.remove(),2200);
+  }
+  function stampUpdate(ts){
+    document.getElementById('updated').textContent = ts || new Date().toISOString().replace('T',' ').slice(0,19);
+  }
+  function statusLabel(s){ return s==='overseas'?'해외출장':s==='bureau'?'지국':s==='base'?'기본일정':'(무)'; }
 
-      function toLogin(){ document.getElementById('status-page').style.display='none'; document.getElementById('issue-page').style.display='none'; const lp=document.getElementById('login-page'); lp.style.display='flex'; lp.classList.add('active'); window.scrollTo({top:0,behavior:'auto'}); }
-      window.toLogin = toLogin;
+  window.show = (id)=>{
+    document.getElementById('login').classList.toggle('hidden', id!=='login');
+    document.getElementById('status').classList.toggle('hidden', id!=='status');
+    if(id==='status'){ loadPhoneMaps().finally(()=>buildBoards()); }
+    window.scrollTo(0,0);
+  };
 
-      function buildTableOnce(){
-        const tbodyLeft=document.getElementById('mng-left'); const tbodyRight=document.getElementById('mng-right'); if(!tbodyLeft||!tbodyRight) return;
-        tbodyLeft.innerHTML=''; tbodyRight.innerHTML=''; const isMobile=window.matchMedia('(max-width:1023px)').matches;
-        mngList.forEach((item,idx)=>{
-          const tr=document.createElement('tr'); tr.dataset.num=item.num; tr.className=isUsed(item)?'used':'unused';
-          tr.innerHTML=`<td class="left-stamp"><button class="chip ${isUsed(item)?'chip-used':'chip-idle'}" data-history="${item.num}">${item.num}</button></td>
-            <td><input type="text" data-field="vj" placeholder="이름" value="${item.vj||''}"></td>
-            <td><input type="text" data-field="audio" placeholder="이름" value="${item.audio||''}"></td>
-            <td><input type="text" data-field="region" placeholder="예: 강남" value="${item.region||''}"></td>
-            <td class="action-cell"><button class="reset" data-reset="${item.num}" title="반납(초기화)" aria-label="반납">⟲</button></td>`;
-          (isMobile || idx<10 ? tbodyLeft : tbodyRight).appendChild(tr);
-        });
-        if(!listenersAttached){
-          [tbodyLeft,tbodyRight].forEach(tbody=>{
-            tbody.addEventListener('input',e=>{
-              const inp=e.target.closest('input[data-field]'); if(!inp) return;
-              const tr=e.target.closest('tr'); if(!tr) return; const num=tr.dataset.num; const field=inp.dataset.field; const item=mngList.find(m=>m.num===num); if(!item) return;
-              item[field]=inp.value; setRowClass(num); refreshIssueDropdown();
-            });
-            tbody.addEventListener('click',async e=>{
-              const resetBtn=e.target.closest('button[data-reset]');
-              if(resetBtn){
-                const num=resetBtn.dataset.reset; const item=mngList.find(m=>m.num===num); if(!item) return;
-                if(!confirm('해당 MNG 반납처리 하시겠습니까?')) return;
-                if(isUsed(item)){ await appendHistory(num,{ vj:item.vj||'', audio:item.audio||'', region:item.region||'', returnedAt:new Date().toISOString() }); }
-                const prev={ vj:item.vj||'', audio:item.audio||'', region:item.region||'' };
-                item.vj=item.audio=item.region=''; const tr=rowEl(num); if(tr){ tr.querySelectorAll('input').forEach(i=>i.value=''); } setRowClass(num);
-                const nowTs=Date.now();
-                if(firebaseReady){
-                  await DB.setData(`mngData/${num}`, { vj:'', audio:'', region:'' });
-                  await DB.setData('lastReturn', { mng:num, user:'-', region:'-', returnedBy: currentUserName || '(알수없음)', ts: nowTs });
-                  const newLog={ type:'return', mng:num, user:prev.vj||'-', region:prev.region||'-', by: currentUserName || '(알수없음)', ts: nowTs };
-                  const updated=[newLog, ...(allLogs||[])].slice(0, LOG_LIMIT); allLogs=updated; await DB.setData('globalLog', updated);
-                }
-                refreshIssueDropdown(); return;
-              }
-              const histBtn=e.target.closest('button[data-history]');
-              if(histBtn){
-                const num=histBtn.dataset.history; const arr=histories && histories[num] ? histories[num] : [];
-                if(!arr.length){ alert(`<${num} 과거 기록>\\n기록이 없습니다.`); return; }
-                const safeTime = ts => { if(!ts) return '-'; const d=new Date(ts); return isNaN(d)?'-':`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}시${p(d.getMinutes())}분`; };
-                const lines = arr.map(e => { const ts=e.returnedAt||e.issuedAt; const action=e.returnedAt?'반납':(e.issuedAt?'불출':''); return `${e.vj||'-'} / ${e.audio||'-'} / ${e.region||'-'} / ${safeTime(ts)} ${action}`; });
-                alert(`<${num} 과거 기록>\n` + lines.join('\n'));
-              }
-            });
-          });
-          listenersAttached=true;
-        }
+  window.go = ()=>{
+    const code=(document.getElementById('login-code').value||'').trim();
+    if(!code){ toast('로그인 코드를 입력해 주세요.'); return; }
+    if(code==='mbcmng2%'){ ROLE='editor'; toast('관리 권한으로 로그인되었습니다.'); }
+    else if(code==='mbcmng1!'){ ROLE='viewer'; toast('열람 전용으로 로그인되었습니다.'); }
+    else { toast('로그인 코드가 올바르지 않습니다.'); return; }
+    show('status');
+  };
+
+  // ===== 현황판 레이아웃 =====
+  const TOP=[1,2,3,4,6,7,8,9,10,17], BOTTOM=[18,19,20,21,22,23,24,25,26,27];
+  const osMap={1:"windows",2:"Linux v7",3:"windows",4:"windows",6:"windows",7:"windows",8:"Linux v7",9:"windows",10:"windows",17:"Linux v3",
+               18:"Linux v3",19:"Linux v4",20:"Linux v4",21:"Linux v4",22:"Linux v4",23:"Linux v7",24:"Linux v7",25:"Linux v7",26:"Linux v7",27:"Linux v7"};
+  const state={}, logs={}; [...TOP,...BOTTOM].forEach(n=>{ const id=`MNG-${String(n).padStart(2,'0')}`; state[id]={status:'none',userPhone:defaultPhone,audioPhone:defaultPhone}; logs[id]=[]; });
+
+  function cell(text,cls=''){ const d=document.createElement('div'); d.className='cell '+cls; d.textContent=text; return d; }
+  function mngHeaderCell(name, os, cid){ const d=cell('','hdr'); d.dataset.cid=cid; d.innerHTML=`<div class="mng-hdr"><div class="mng-name">${name}</div><div class="mng-os">${os}</div></div>`; return d; }
+
+  function mountGrid(host, list){
+    host.style.setProperty('--cols', list.length); host.innerHTML='';
+    host.appendChild(cell('항목','hdr title')).dataset.cid='LABEL';
+    for(const n of list){ const id=`MNG-${String(n).padStart(2,'0')}`; host.appendChild(mngHeaderCell(id, osMap[n]||'', id)); }
+    const labels=['취재','사용자','사용자폰','오디오','오디오폰','위치','아이템',''];
+    for(const lab of labels){
+      host.appendChild(cell(lab,'title')).dataset.cid='LABEL';
+      for(const n of list){
+        const id=`MNG-${String(n).padStart(2,'0')}`; const rec=state[id]||{}; const c=cell('', ''); c.dataset.cid=id;
+        if(lab==='취재'){ c.innerHTML=`<input data-id="${id}" data-field="reporter" value="${rec.reporter||''}" placeholder="">`; }
+        else if(lab==='사용자'){ c.innerHTML=`<input data-id="${id}" data-field="user" value="${rec.user||''}" placeholder="">`; }
+        else if(lab==='사용자폰'){ const val=(rec.userPhone&&rec.userPhone!==defaultPhone)?rec.userPhone:''; c.innerHTML=`<input data-id="${id}" data-field="userPhone" value="${val}" disabled>`; }
+        else if(lab==='오디오'){ c.innerHTML=`<input data-id="${id}" data-field="audio" value="${rec.audio||''}" placeholder="">`; }
+        else if(lab==='오디오폰'){ const val2=(rec.audioPhone&&rec.audioPhone!==defaultPhone)?rec.audioPhone:''; c.innerHTML=`<input data-id="${id}" data-field="audioPhone" value="${val2}" disabled>`; }
+        else if(lab==='위치'){ c.innerHTML=`<input data-id="${id}" data-field="region" value="${rec.region||''}" placeholder="">`; }
+        else if(lab==='아이템'){ c.innerHTML=`<input data-id="${id}" data-field="item" value="${rec.item||''}" placeholder="">`; }
+        else { c.innerHTML=`<button class="btn-return" data-return="${id}">반납</button>`; }
+        host.appendChild(c);
       }
-
-      function populateFromSnapshot(data){
-        mngList.forEach(item=>{
-          if(data && data[item.num]){ Object.assign(item, data[item.num]); }
-          const r=rowEl(item.num); if(!r) return;
-          const vj=r.querySelector('input[data-field="vj"]'); const au=r.querySelector('input[data-field="audio"]'); const re=r.querySelector('input[data-field="region"]');
-          if(vj && vj!==document.activeElement) vj.value=item.vj||'';
-          if(au && au!==document.activeElement) au.value=item.audio||'';
-          if(re && re!==document.activeElement) re.value=item.region||'';
-          setRowClass(item.num);
-        });
-        refreshIssueDropdown();
-      }
-
-      function buildIssueDropdown(all=true){
-        const sel=document.getElementById('issue-mng'); if(!sel) return;
-        sel.innerHTML='<option value="" disabled selected>선택</option>';
-        MNG_NUMBERS.forEach(n=>{
-          const label=`MNG-${String(n).padStart(2,'0')}`;
-          if(!all){ const item=mngList.find(m=>m.num===label); if(item && isUsed(item)) return; }
-          const opt=document.createElement('option'); opt.value=label; opt.textContent=label; sel.appendChild(opt);
-        });
-      }
-      function refreshIssueDropdown(){ buildIssueDropdown(false); }
-
-      async function appendHistory(num, entry){ const arr=histories[num] ? [...histories[num]] : []; arr.unshift(entry); histories[num]=arr.slice(0,5); if(firebaseReady){ await DB.setData(`mngHistory/${num}`, histories[num]); } }
-
-      async function submitIssue(){
-        const sel=document.getElementById('issue-mng'); const userEl=document.getElementById('issue-user'); const regionEl=document.getElementById('issue-region');
-        if(!sel) return; const mng=sel.value; const user=(userEl?.value||'').trim(); const region=(regionEl?.value||'').trim();
-        if(!mng){ alert('MNG를 선택해주세요.'); return; } if(!user){ alert('사용자 이름을 입력해주세요.'); return; } if(!region){ alert('위치를 입력해주세요.'); return; }
-        await appendHistory(mng,{ vj:user, audio: currentUserName || '', region, issuedAt:new Date().toISOString() });
-        const nowTs=Date.now();
-        if(firebaseReady){
-          await DB.setData(`mngData/${mng}`, { vj:user, audio: currentUserName || '', region });
-          await DB.setData('lastIssue', { mng, user, region, issuedBy: currentUserName || '(알수없음)', ts: nowTs });
-          const newLog={ type:'issue', mng, user, region, by: currentUserName || '(알수없음)', ts: nowTs };
-          const updated=[newLog, ...(allLogs||[])].slice(0, LOG_LIMIT); allLogs=updated; await DB.setData('globalLog', updated);
-        }
-        alert('불출 되었습니다!'); if(userEl) userEl.value=''; if(regionEl) regionEl.value=''; refreshIssueDropdown();
-      }
-
-      function showScreen(id){ const lp=document.getElementById('login-page'); const sp=document.getElementById('status-page'); const ip=document.getElementById('issue-page');
-        lp.style.display = id==='login' ? 'flex':'none'; sp.style.display = id==='status' ? 'block':'none'; ip.style.display = id==='issue' ? 'block':'none';
-        if(id==='login'){ lp.classList.add('active'); } window.scrollTo({top:0,behavior:'auto'});
-      }
-      function safeBind(id,event,handler){ const el=document.getElementById(id); if(el) el.addEventListener(event, handler, { passive:false }); }
-      function attachLoginHandlers(){
-        const codeInput=document.getElementById('login-code'); const btnStatus=document.getElementById('btn-login-status'); const btnIssue=document.getElementById('btn-login-issue'); const btnIssueSubmit=document.getElementById('btn-issue-submit');
-        safeBind('btn-log','click', openLogModal);
-        function chooseMode(m){ intendedMode=m; }
-        function login(){
-          const code=(codeInput?.value||'').trim(); const name=getUserByCode(code);
-          if(name){ currentUserName=name;
-            if(intendedMode==='issue'){ showScreen('issue'); buildIssueDropdown(false); const issuer=document.getElementById('issue-issuer'); if(issuer) issuer.value=currentUserName||''; if(firebaseReady && !dataListenersStarted){ DB.startListeners(); } }
-            else{ showScreen('status'); buildTableOnce(); if(firebaseReady && !dataListenersStarted){ DB.startListeners(); } if(firebaseReady && !syncTimer){ syncTimer=setInterval(()=>DB.syncAll(), 5000); } }
-          }else{ alert('잘못된 로그인 코드입니다.'); }
-        }
-        btnStatus && btnStatus.addEventListener('click', (e)=>{ e.preventDefault(); chooseMode('status'); login(); });
-        btnIssue  && btnIssue.addEventListener('click',  (e)=>{ e.preventDefault(); chooseMode('issue');  login(); });
-        btnIssueSubmit && btnIssueSubmit.addEventListener('click', submitIssue);
-        codeInput && codeInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); chooseMode('status'); login(); } });
-      }
-
-      // Log 모달 & 다운로드 & 전체 삭제
-      function renderLogList(){
-        const list=document.getElementById('log-list'); if(!list) return; list.innerHTML='';
-        const recent=(allLogs||[]).slice(0,RECENT_SHOW);
-        if(!recent.length){ const empty=document.createElement('div'); empty.className='log-item'; empty.textContent='표시할 기록이 없습니다.'; list.appendChild(empty); return; }
-        for(const e of recent){
-          const d=new Date(e.ts||Date.now()); const actionText=e.type==='issue'?'불출':'반납';
-          const item=document.createElement('div'); item.className='log-item';
-          item.innerHTML=`<div><b>${e.mng}</b> · ${actionText}</div><div class="log-meta">${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}시${p(d.getMinutes())}분 · 사용자: ${e.user||'-'} · 위치: ${e.region||'-'} · 처리자: ${e.by||'-'}</div>`;
-          list.appendChild(item);
-        }
-      }
-      function openLogModal(){ const modal=document.getElementById('log-modal'); if(!modal) return; renderLogList(); modal.setAttribute('aria-hidden','false'); }
-      function closeLogModal(){ const modal=document.getElementById('log-modal'); if(!modal) return; modal.setAttribute('aria-hidden','true'); }
-      async function clearAllLogs(){
-        const pw = window.prompt('Log 전체 삭제 비밀번호를 입력하세요:\\n(삭제 후 되돌릴 수 없습니다)');
-        if(pw !== 'mbcmngreset'){
-          if(pw !== null) alert('비밀번호가 올바르지 않습니다.');
+    }
+    // 입력 핸들러
+    // Tab down navigation
+    const editableOrder=['reporter','user','audio','region','item'];
+    function nextFocus(el){
+      const field=el.dataset.field, id=el.dataset.id;
+      const mngs=[...TOP,...BOTTOM].map(n=>'MNG-'+String(n).padStart(2,'0'));
+      const colIndex=mngs.indexOf(id);
+      let idx=editableOrder.indexOf(field);
+      // find next focus target: next field in same column, then first field of next column
+      while(true){
+        idx++;
+        if(idx<editableOrder.length){
+          const target=document.querySelector(`[data-cid='${id}'] input[data-field='${editableOrder[idx]}']`);
+          if(target && !target.disabled){ target.focus(); return; }
+          continue;
+        }else{
+          // move to next column start
+          const nextCol = (colIndex+1) % mngs.length;
+          const nextId = mngs[nextCol];
+          const target=document.querySelector(`[data-cid='${nextId}'] input[data-field='${editableOrder[0]}']`);
+          if(target && !target.disabled){ target.focus(); return; }
           return;
         }
-        try{
-          if(firebaseReady && DB){
-            await DB.setData('globalLog', []);
-            await DB.setData('mngHistory', {});
-            await DB.setData('lastIssue', null);
-            await DB.setData('lastReturn', null);
-          }
-          allLogs = [];
-          histories = {};
-          lastUpdateTs = 0;
-          renderTimes();
-          renderLogList();
-          window.alert('Log가 모두 삭제되었습니다.');
-        }catch(err){
-          console.error(err); window.alert('삭제 중 오류가 발생했습니다.');
+      }
+    }
+    host.querySelectorAll('input[data-id]').forEach(el=>{
+      el.addEventListener('keydown', (e)=>{
+        if(e.key==='Tab' && !e.shiftKey){
+          e.preventDefault();
+          nextFocus(e.currentTarget);
         }
-      }
-      function buildTxtFromLogs(entries){
-        const lines=['# MNG Global Log (최신순, 최대 500개)'];
-        for(const e of entries){
-          const d=new Date(e.ts||Date.now());
-          const p2=n=>String(n).padStart(2,'0');
-          const actionText=e.type==='issue'?'불출':'반납';
-          lines.push(`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())} | ${e.mng} | ${actionText} | 사용자:${e.user||'-'} | 위치:${e.region||'-'} | 처리자:${e.by||'-'}`);
-        }
-        return lines.join('\\n');
-      }
-      function downloadLogTxt(){
-        const d=kstNow(); const p2=n=>String(n).padStart(2,'0');
-        const filename=`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}_MNG_log.txt`;
-        const blob=new Blob([buildTxtFromLogs((allLogs||[]).slice(0,LOG_LIMIT))],{type:'text/plain;charset=utf-8'});
-        const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-      }
-
-      window.addEventListener('DOMContentLoaded',()=>{
-        try{
-          attachLoginHandlers();
-          // Wire modal footer buttons
-          const btnClose=document.getElementById('btn-log-close');
-          const btnDl=document.getElementById('btn-log-download');
-          const btnClr=document.getElementById('btn-log-clear');
-          btnClose && btnClose.addEventListener('click', closeLogModal);
-          btnDl && btnDl.addEventListener('click', downloadLogTxt);
-          btnClr && btnClr.addEventListener('click', clearAllLogs);
-
-          showScreen('login'); buildTableOnce(); renderTimes();
-          // Firebase lazy-load
-          (async ()=>{
-            try{
-              const [{ initializeApp }, { getDatabase, ref, set, onValue }] = await Promise.all([
-                import('https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js'),
-                import('https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js')
-              ]);
-              const firebaseConfig = { apiKey:"AIzaSyADWorIbKPZZoWx7qAriiCA2lYtf-MSdAA", authDomain:"mbc-mng.firebaseapp.com", databaseURL:"https://mbc-mng-default-rtdb.firebaseio.com", projectId:"mbc-mng", storageBucket:"mbc-mng.firebasestorage.app", messagingSenderId:"845487713315", appId:"1:845487713315:web:d8559559fa98870fde5596" };
-              const app = initializeApp(firebaseConfig); const db = getDatabase(app);
-              DB = {
-                setData:(path,value)=>set(ref(db,path),value),
-                startListeners: () => {
-                  if(dataListenersStarted) return;
-                  const nowTs=Date.now(); if(lastSeen.issue===0 && lastSeen.ret===0){ lastSeen.issue=nowTs; lastSeen.ret=nowTs; }
-                  onValue(ref(db,'mngData'), snap => populateFromSnapshot(snap.val()));
-                  onValue(ref(db,'mngHistory'), snap => { histories = snap.val() || {}; });
-                  onValue(ref(db,'globalLog'), snap => { allLogs = snap.val() || []; if(allLogs.length && allLogs[0].ts){ lastUpdateTs = Math.max(lastUpdateTs, allLogs[0].ts); renderTimes(); } });
-                  onValue(ref(db,'lastIssue'), snap => { const v=snap.val(); if(!v) return; if(document.getElementById('status-page').style.display!=='block') return; if(v.ts && v.ts <= lastSeen.issue) return; lastSeen.issue=v.ts||Date.now(); lastUpdateTs=Math.max(lastUpdateTs,lastSeen.issue); renderTimes(); showToast('issue','새 불출 알림',`${v.issuedBy}님이 ${v.mng}를 불출했습니다<br>${v.user} / ${v.region}`); });
-                  onValue(ref(db,'lastReturn'), snap => { const v=snap.val(); if(!v) return; if(document.getElementById('status-page').style.display!=='block') return; if(v.ts && v.ts <= lastSeen.ret) return; lastSeen.ret=v.ts||Date.now(); lastUpdateTs=Math.max(lastUpdateTs,lastSeen.ret); renderTimes(); showToast('return','반납 알림',`${v.returnedBy}님이 ${v.mng}를 반납했습니다`); });
-                  dataListenersStarted = true;
-                },
-                syncAll: () => { const obj={}; mngList.forEach(it=>obj[it.num]={ vj:it.vj||'', audio:it.audio||'', region:it.region||'' }); set(ref(db,'mngData'), obj); }
-              };
-              firebaseReady = true;
-            }catch(err){ console.error('Firebase 로드 실패:', err); }
-          })();
-        }catch(e){ console.error('초기화 오류:', e); }
       });
-    })();
-  </script>
+      el.addEventListener('input', async e=>{
+        if(ROLE!=='editor'){ e.target.value = state[e.target.dataset.id]?.[e.target.dataset.field] || e.target.value; toast('열람 전용 계정입니다.'); return; }
+        const id=e.target.dataset.id, field=e.target.dataset.field;
+        state[id]=state[id]||{}; state[id][field]=e.target.value.trim();
+        if((field==='user'||field==='audio') && !mapsLoaded){ await loadPhoneMaps(); }
+        if(field==='user'){ state[id].userPhone=getUserPhone(state[id][field]); }
+        if(field==='audio'){ state[id].audioPhone=getAudioPhone(state[id][field]); }
+
+        // 자동 기본일정 전환 + 최초 전환 시 로그기록
+        const r=state[id]; const was=r.status||'none';
+        const filled=(r.user?.trim()&&r.userPhone?.trim()&&r.audio?.trim()&&r.audioPhone?.trim()&&r.region?.trim()&&r.item?.trim());
+        if(filled){ r.status='base'; }
+        renderColumnValues(id); applyStatusStyles();
+        const updated=new Date().toISOString().replace('T',' ').slice(0,19); stampUpdate(updated);
+        if(db) debounceSync(id);
+        if(filled && was!=='base' && was!=='bureau' && was!=='overseas'){
+          const entry={type:'issue', user:r.user, region:r.region, item:r.item, status:'base', reporter:r.reporter||'', audio:r.audio, userPhone:r.userPhone, audioPhone:r.audioPhone, updated};
+          pushLogLocal(id, entry);
+          try{ await appendLog(id, entry); }catch(e){ console.warn(e); }
+        }
+      });
+    });
+    host.querySelectorAll('[data-return]').forEach(btn=>btn.addEventListener('click',e=>doReturn(e.target.dataset.return)));
+    host.querySelectorAll('.hdr').forEach(h=>h.addEventListener('click',()=>openLogs(h.dataset.cid)));
+  }
+
+  function renderColumnValues(id){
+    document.querySelectorAll(`[data-cid='${id}'] input[data-field]`).forEach(inp=>{
+      const f=inp.dataset.field; if(f in (state[id]||{})){
+        let v=state[id][f]??''; if((f==='userPhone'||f==='audioPhone') && (v===''||v===defaultPhone)) v='';
+        inp.value=v;
+      }
+    });
+  }
+
+  function applyStatusStyles(){
+    const ids=[...TOP,...BOTTOM].map(n=>`MNG-${String(n).padStart(2,'0')}`);
+    for(const id of ids){
+      const st=(state[id]&&state[id].status)||'none';
+      const color = st==='overseas'?'var(--overseas)': st==='bureau'?'var(--bureau)': st==='base'?'var(--base)':'#fff';
+      document.querySelectorAll(`[data-cid='${id}']`).forEach(el=>el.style.background=color);
+    }
+  }
+
+  // ===== 로그 사이드 =====
+  window.toggleSide=(f)=>document.getElementById('side').classList.toggle('show',!!f);
+  function openLogs(id){
+    const arr=logs[id]||[]; document.getElementById('side-title').textContent=`${id} · 최근 기록`;
+    const body=document.getElementById('side-body'); body.innerHTML=arr.length?arr.slice(0,10).map(e=>`<div class="log-item">
+      <div><b>${(e.updated)}</b> · ${e.type==='issue'?'불출':'반납'} (${statusLabel(e.status)})</div>
+      <div>사용자: ${e.user||'-'} · 위치: ${e.region||'-'} · 아이템: ${e.item||'-'}</div>
+    </div>`).join(''):'<div style="color:#667;font-size:13px">기록이 없습니다.</div>';
+    toggleSide(true);
+  }
+  function pushLogLocal(id, entry){ const arr=logs[id]||(logs[id]=[]); arr.unshift(Object.assign({ts:Date.now()},entry)); if(arr.length>10) arr.pop(); }
+
+  // ===== 불출 모달 =====
+  async function ensurePhoneMaps(){ if(!mapsLoaded) await loadPhoneMaps(); }
+  function buildIssue(){
+    const sel=document.getElementById('iss-mng');
+    if(!sel.dataset.filled){
+      sel.innerHTML='<option value="" disabled selected>선택</option>'+[...TOP,...BOTTOM].map(n=>{
+        const id=`MNG-${String(n).padStart(2,'0')}`; return `<option value="${id}">${id}</option>`;
+      }).join(''); sel.dataset.filled='1';
+    }
+    const u=document.getElementById('iss-user'), a=document.getElementById('iss-audio');
+    const up=document.getElementById('iss-user-phone'), ap=document.getElementById('iss-audio-phone');
+    const syncU=()=>{ const p=getUserPhone(u.value||''); up.value=(p===defaultPhone?'':p); };
+    const syncA=()=>{ const p=getAudioPhone(a.value||''); ap.value=(p===defaultPhone?'':p); };
+    u.oninput=syncU; a.oninput=syncA; syncU(); syncA();
+  }
+  window.openIssue=async()=>{ if(ROLE!=='editor'){ toast('열람 전용 계정입니다.'); return; } await ensurePhoneMaps(); buildIssue(); document.getElementById('issue-modal').classList.add('show'); };
+  window.closeIssue=()=>document.getElementById('issue-modal').classList.remove('show');
+
+  window.submitIssue=async()=>{
+    if(ROLE!=='editor'){ toast('열람 전용 계정입니다.'); return; }
+    const m=document.getElementById('iss-mng').value, u=document.getElementById('iss-user').value.trim();
+    const r=document.getElementById('iss-region').value.trim(), it=document.getElementById('iss-item').value.trim();
+    const st=document.getElementById('iss-status').value;
+    const up=document.getElementById('iss-user-phone').value || defaultPhone;
+    const a=document.getElementById('iss-audio').value.trim(), ap=document.getElementById('iss-audio-phone').value || defaultPhone;
+    if(!m||!u||!r){ toast('MNG, 사용자, 위치를 입력해 주세요.'); return; }
+    const updated=new Date().toISOString().replace('T',' ').slice(0,19);
+    const record={user:u, region:r, item:it, status:st, reporter:state[m].reporter||'', audio:a, userPhone:up, audioPhone:ap, updated};
+    state[m]=Object.assign({},record); pushLogLocal(m,{type:'issue',...record}); stampUpdate(updated); applyStatusStyles(); renderColumnValues(m); toast('불출 완료'); closeIssue();
+    try{ await saveStatus(m, record); await appendLog(m, Object.assign({type:'issue'}, record)); }catch(e){ console.warn(e); toast('Firebase 동기화 실패'); }
+  };
+
+  // ===== 반납 =====
+  async function doReturn(id){
+    if(ROLE!=='editor'){ toast('열람 전용 계정입니다.'); return; }
+    const rec=state[id]||{}; const updated=new Date().toISOString().replace('T',' ').slice(0,19);
+    pushLogLocal(id,{type:'return',...rec,updated}); state[id]={status:'none',userPhone:defaultPhone,audioPhone:defaultPhone};
+    buildBoards(); stampUpdate(updated); toast('반납 처리');
+    try{ await saveStatus(id, {status:'none',userPhone:defaultPhone,audioPhone:defaultPhone,updated}); await appendLog(id, Object.assign({type:'return'}, rec, {updated})); }catch(e){ console.warn(e); toast('Firebase 동기화 실패'); }
+  }
+  window.doReturn=doReturn;
+
+  // ===== Firebase 실시간 바인딩 =====
+  function bindRealtimeOnce(){
+    if(bindRealtimeOnce._done || !db) return; bindRealtimeOnce._done=true;
+    [...TOP,...BOTTOM].forEach(n=>{
+      const id=`MNG-${String(n).padStart(2,'0')}`;
+      onValue(ref(db,`status/${id}`),(snap)=>{
+        const v=snap.val(); if(v){ state[id]=Object.assign({userPhone:defaultPhone,audioPhone:defaultPhone},v); }
+        renderColumnValues(id); applyStatusStyles(); stampUpdate(v&&v.updated?v.updated:null);
+      });
+      onValue(ref(db,`logs/${id}`),(snap)=>{
+        const arr=[]; snap.forEach(ch=>arr.unshift(ch.val()));
+        if(arr.length>0){
+          // merge with existing local logs and de-duplicate by updated+type+item
+          const key = (x)=>[x.updated,x.type,x.item||'',x.user||''].join('|');
+          const map=new Map();
+          [...arr, ...(logs[id]||[])].forEach(e=>{ if(e && e.updated) map.set(key(e), e); });
+          logs[id] = Array.from(map.values()).slice(0,10);
+        } // if no remote logs, keep local logs (do not overwrite)
+      });
+    });
+  }
+
+  // ===== 동기화 디바운스 =====
+  const pending=new Map();
+  function debounceSync(id){
+    if(!db) return; clearTimeout(pending.get(id));
+    const h=setTimeout(async()=>{
+      const v=state[id]; const updated=new Date().toISOString().replace('T',' ').slice(0,19);
+      try{ await saveStatus(id, Object.assign({}, v, {updated})); }catch(e){ console.warn(e); }
+    },400); pending.set(id,h);
+  }
+
+  window.captureBoard = async function(){
+    try{
+      const node=document.querySelector('.board-wrap');
+      const canvas=await html2canvas(node,{useCORS:true,backgroundColor:null,scale:2});
+      if(navigator.clipboard && window.ClipboardItem){
+        await new Promise(res=>canvas.toBlob(res));
+        const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+        toast('화면 캡쳐를 클립보드에 저장했습니다.');
+      }else{
+        const link=document.createElement('a'); link.download='mng_board.png'; link.href=canvas.toDataURL('image/png'); link.click();
+        toast('클립보드 미지원: 파일로 다운로드했습니다.');
+      }
+    }catch(e){ console.warn(e); toast('캡쳐 실패'); }
+  }
+
+  function buildBoards(){
+    const contTop=document.getElementById('grid-top'), contBottom=document.getElementById('grid-bottom');
+    mountGrid(contTop, TOP); mountGrid(contBottom, BOTTOM); applyStatusStyles();
+    // 권한 반영
+    const isViewer=(ROLE!=='editor');
+    document.querySelectorAll('.grid input').forEach(inp=>{ inp.disabled = inp.disabled || isViewer || inp.dataset.field==='userPhone' || inp.dataset.field==='audioPhone'; });
+    const ib=document.getElementById('issue-btn'); if(ib){ ib.disabled=isViewer; if(isViewer){ ib.style.opacity='0.5'; ib.style.cursor='not-allowed'; } else { ib.style.opacity='1'; ib.style.cursor='pointer'; } }
+    document.querySelectorAll('.btn-return').forEach(b=>{ if(isViewer){ b.disabled=true; b.style.opacity='0.5'; b.style.cursor='not-allowed'; } });
+    bindRealtimeOnce();
+  }
+
+  // 초기 로드
+  window.addEventListener('DOMContentLoaded',()=>{ loadPhoneMaps(); });
+</script>
 </body>
 </html>
